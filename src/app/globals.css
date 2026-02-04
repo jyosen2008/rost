@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f6f1f3;
+  color: #1b223a;
+}
+
+a {
+  color: inherit;
+}

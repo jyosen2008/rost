@@ -1,0 +1,62 @@
+-- Supabase schema for Röst blog
+
+create extension if not exists "pgcrypto";
+
+create table if not exists categories (
+  name text primary key
+);
+
+create table if not exists tags (
+  name text primary key
+);
+
+create table if not exists posts (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  slug text not null unique,
+  excerpt text,
+  content text not null,
+  cover_url text,
+  category text references categories(name),
+  tags text[],
+  published_at timestamptz default now(),
+  created_at timestamptz default now(),
+  author_name text
+);
+
+create table if not exists comments (
+  id uuid primary key default gen_random_uuid(),
+  post_id uuid references posts(id) on delete cascade,
+  author_name text not null,
+  body text not null,
+  created_at timestamptz default now()
+);
+
+-- Row-level security for public reads
+alter table posts enable row level security;
+alter table comments enable row level security;
+
+create policy "Allow read posts" on posts for select using (true);
+create policy "Allow read comments" on comments for select using (true);
+
+create policy "Allow authenticated inserts" on posts
+  for insert with check (auth.role() = 'authenticated');
+
+create policy "Allow authenticated comments" on comments
+  for insert with check (auth.role() = 'authenticated');
+
+-- Seed some starter metadata
+insert into categories (name) values
+  ('Personal Essays'),
+  ('Community Notes'),
+  ('Collective Journals'),
+  ('Creative Process')
+on conflict do nothing;
+
+insert into tags (name) values
+  ('reflection'),
+  ('art'),
+  ('science'),
+  ('notes'),
+  ('archive')
+on conflict do nothing;
