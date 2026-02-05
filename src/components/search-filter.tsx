@@ -4,18 +4,14 @@ import { useState } from 'react'
 
 type SearchFilterProps = {
   categories: string[]
-  tags: string[]
   onSearch: (value: string) => void
   onCategoryChange: (category: string | null) => void
-  onTagChange: (tag: string | null) => void
 }
 
 export default function SearchFilter({
-  tags,
   categories,
   onSearch,
-  onCategoryChange,
-  onTagChange
+  onCategoryChange
 }: SearchFilterProps) {
   const [input, setInput] = useState('')
 
@@ -48,17 +44,6 @@ export default function SearchFilter({
           {categories.map((category) => (
             <option key={category} value={category}>
               {category}
-            </option>
-          ))}
-        </select>
-        <select
-          onChange={(event) => onTagChange(event.target.value || null)}
-          className="rounded-full border border-peat/10 bg-white px-3 py-1 text-sm"
-        >
-          <option value="">All Tags</option>
-          {tags.map((tag) => (
-            <option key={tag} value={tag}>
-              {tag}
             </option>
           ))}
         </select>

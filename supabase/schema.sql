@@ -32,6 +32,25 @@ create table if not exists comments (
   created_at timestamptz default now()
 );
 
+create table if not exists bookmarks (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users on delete cascade,
+  post_id uuid references posts(id) on delete cascade,
+  created_at timestamptz default now(),
+  constraint bookmarks_user_post_unique unique (user_id, post_id)
+);
+
+alter table bookmarks enable row level security;
+
+create policy "Allow users to read their bookmarks" on bookmarks
+  for select using (user_id = auth.uid());
+
+create policy "Allow users to save bookmarks" on bookmarks
+  for insert with check (user_id = auth.uid());
+
+create policy "Allow users to remove bookmarks" on bookmarks
+  for delete using (user_id = auth.uid());
+
 -- Row-level security for public reads
 alter table posts enable row level security;
 alter table comments enable row level security;

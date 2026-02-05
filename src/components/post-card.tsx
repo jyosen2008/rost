@@ -5,7 +5,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 
-export default function PostCard({ post }: { post: Post }) {
+type PostCardProps = {
+  post: Post
+  isBookmarked?: boolean
+  onBookmarkToggle?: () => void
+}
+
+export default function PostCard({ post, isBookmarked = false, onBookmarkToggle }: PostCardProps) {
   return (
     <motion.article
       whileHover={{ y: -4 }}
@@ -41,12 +47,30 @@ export default function PostCard({ post }: { post: Post }) {
         ))}
       </div>
       <div className="mt-6 flex items-center justify-between">
-        <Link
-          href={`/posts/${post.slug ?? post.id}`}
-          className="text-sm font-semibold uppercase tracking-[0.3em] text-ember"
-        >
-          Read
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          {typeof onBookmarkToggle === 'function' ? (
+            <button
+              type="button"
+              onClick={onBookmarkToggle}
+              className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+                isBookmarked
+                  ? 'border-ember/70 bg-ember/10 text-ember'
+                  : 'border-white/40 text-peat/70 hover:border-peat/60'
+              }`}
+            >
+              <span aria-hidden="true" className="text-xs">
+                {isBookmarked ? '★' : '☆'}
+              </span>
+              <span>{isBookmarked ? 'Saved' : 'Bookmark'}</span>
+            </button>
+          ) : null}
+          <Link
+            href={`/posts/${post.slug ?? post.id}`}
+            className="text-sm font-semibold uppercase tracking-[0.3em] text-ember"
+          >
+            Read
+          </Link>
+        </div>
         <span className="text-sm font-light text-peat/60">By {post.author_name ?? 'a Röst writer'}</span>
       </div>
     </motion.article>

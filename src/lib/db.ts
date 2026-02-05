@@ -94,3 +94,33 @@ export async function getComments(postId: string) {
   }
   return data
 }
+
+export type LiveStatsSummary = {
+  totalPosts: number
+  totalComments: number
+  totalBookmarks: number
+}
+
+export async function getLiveStats(): Promise<LiveStatsSummary> {
+  const [postsResult, commentsResult, bookmarksResult] = await Promise.all([
+    supabaseServer.from('posts').select('id', { head: true, count: 'exact' }),
+    supabaseServer.from('comments').select('id', { head: true, count: 'exact' }),
+    supabaseServer.from('bookmarks').select('id', { head: true, count: 'exact' })
+  ])
+
+  if (postsResult.error) {
+    console.error('Live stats posts count failed', postsResult.error)
+  }
+  if (commentsResult.error) {
+    console.error('Live stats comments count failed', commentsResult.error)
+  }
+  if (bookmarksResult.error) {
+    console.error('Live stats bookmarks count failed', bookmarksResult.error)
+  }
+
+  return {
+    totalPosts: postsResult.count ?? 0,
+    totalComments: commentsResult.count ?? 0,
+    totalBookmarks: bookmarksResult.count ?? 0
+  }
+}

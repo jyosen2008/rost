@@ -2,31 +2,44 @@
 
 import { useMemo, useRef, useState } from 'react'
 import AuthPanel from './auth-panel'
+import BookmarkedStories from './bookmarked-stories'
+import FeaturedCarousel from './featured-carousel'
+import LiveStats from './live-stats'
 import PostCard from './post-card'
 import PostCreator from './post-creator'
 import SearchFilter from './search-filter'
+import StoryPromptWidget from './story-prompt-widget'
+import TagPills from './tag-pills'
 import ThemeToggle from './theme-toggle'
-import { Post } from '@/lib/db'
+import WriterSpotlight from './writer-spotlight'
+import { useBookmarks } from '@/hooks/use-bookmarks'
+import { LiveStatsSummary, Post } from '@/lib/db'
 
 export default function HomeClient({
   posts,
   categories,
-  tags
+  tags,
+  liveStats
 }: {
   posts: Post[]
   categories: string[]
   tags: string[]
+  liveStats: LiveStatsSummary
 }) {
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const storyScrollRef = useRef<HTMLDivElement>(null)
+  const { bookmarks, toggleBookmark } = useBookmarks()
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
       const lowerTitle = post.title.toLowerCase()
       const lowerExcerpt = (post.excerpt ?? '').toLowerCase()
-      const searchMatch = search === '' || lowerTitle.includes(search.toLowerCase()) || lowerExcerpt.includes(search.toLowerCase())
+      const searchMatch =
+        search === '' ||
+        lowerTitle.includes(search.toLowerCase()) ||
+        lowerExcerpt.includes(search.toLowerCase())
       if (!searchMatch) return false
       if (selectedCategory && post.category !== selectedCategory) return false
       if (selectedTag && !(post.tags ?? []).includes(selectedTag)) return false
@@ -34,6 +47,25 @@ export default function HomeClient({
     })
   }, [posts, search, selectedCategory, selectedTag])
 
+  const featuredPosts = useMemo(() => posts.filter((post) => post.cover_url).slice(0, 6), [posts])
+
+  const writerStats = useMemo(() => {
+    const collector = new Map<string, number>()
+    posts.forEach((post) => {
+      const author = post.author_name?.trim() || 'A Röst writer'
+      collector.set(author, (collector.get(author) ?? 0) + 1)
+    })
+    return Array.from(collector.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+  }, [posts])
+
+  const topWriter = writerStats[0] ?? null
+  const otherWriters = writerStats.slice(1, 4)
+  const bookmarkedPosts = useMemo(
+    () => posts.filter((post) => bookmarks.includes(post.id)),
+    [posts, bookmarks]
+  )
   const scrollToStories = () => {
     storyScrollRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -70,19 +102,58 @@ export default function HomeClient({
         </div>
       </header>
 
-      <SearchFilter
-        categories={categories}
-        tags={tags}
-        onSearch={setSearch}
-        onCategoryChange={setSelectedCategory}
-        onTagChange={setSelectedTag}
+      <FeaturedCarousel posts={featuredPosts} />
+
+      <LiveStats
+        postsCount={liveStats.totalPosts}
+        commentsCount={liveStats.totalComments}
+        bookmarksCount={liveStats.totalBookmarks}
+        categoriesCount={categories.length}
+        tagsCount={tags.length}
+        authorsCount={writerStats.length}
       />
+
+      <div className="grid gap-6 lg:grid-cols-[1.3fr,0.7fr]">
+        <div className="space-y-6">
+          <SearchFilter
+            categories={categories}
+            onSearch={setSearch}
+            onCategoryChange={setSelectedCategory}
+          />
+          <TagPills tags={tags} selectedTag={selectedTag} onTagSelect={setSelectedTag} />
+        </div>
+        <div className="space-y-6">
+          <WriterSpotlight
+            topWriter={topWriter}
+            otherWriters={otherWriters}
+            totalWriters={writerStats.length}
+          />
+          <StoryPromptWidget />
+        </div>
+      </div>
+
+      {bookmarkedPosts.length > 0 ? (
+        <BookmarkedStories posts={bookmarkedPosts} />
+      ) : (
+        <div className="rounded-3xl border border-peat/10 bg-white/80 p-5 text-sm text-peat/70 shadow-sm">
+          <p className="text-xs uppercase tracking-[0.3em] text-peat/60">Bookmarks</p>
+          <p className="mt-2 font-semibold text-peat">Save your favorite stories to revisit them later.</p>
+          <p className="text-peat/60">Tap the bookmark icon on each story card to build a personal reading list.</p>
+        </div>
+      )}
 
       <div ref={storyScrollRef} className="grid gap-6 lg:grid-cols-[repeat(2,minmax(0,1fr))]">
         {filteredPosts.length === 0 ? (
           <p className="text-peat/60">No posts match your filters yet.</p>
         ) : (
-          filteredPosts.map((post) => <PostCard key={post.id} post={post} />)
+          filteredPosts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              isBookmarked={bookmarks.includes(post.id)}
+              onBookmarkToggle={() => toggleBookmark(post.id)}
+            />
+          ))
         )}
       </div>
 

@@ -48,3 +48,9 @@ You asked for a unique name and matching domain. When you're ready, grab a free 
 - The Supabase Auth panel uses email/password and is open for public signup.
 - The `supabase/schema.sql` file seeds a few categories/tags, but feel free to expand them manually.
 - When you have a final logo, drop it into `src/app/assets` and update the layout accordingly.
+
+## Recent improvements
+
+- Featured carousel, live stats, writer spotlight, and story-prompt widgets were added to highlight the community, moods, and sparks worth exploring.
+- Tag pills and bookmark support let readers filter by mood and save stories for later; bookmarks are stored in the new `bookmarks` table (re-run `supabase/schema.sql` to create the table and policies).
+- Authentication now includes Google, Apple, and Facebook OAuth providers alongside the existing email/password flow.
