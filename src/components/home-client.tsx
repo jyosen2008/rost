@@ -24,18 +24,17 @@ export default function HomeClient({
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
-      const matchesSearch =
-        search === '' ||
-        post.title.toLowerCase().includes(search.toLowerCase()) ||
-        (post.excerpt ?? '').toLowerCase().includes(search.toLowerCase())
-      if (!matchesSearch) return false
+      const lowerTitle = post.title.toLowerCase()
+      const lowerExcerpt = (post.excerpt ?? '').toLowerCase()
+      const searchMatch = search === '' || lowerTitle.includes(search.toLowerCase()) || lowerExcerpt.includes(search.toLowerCase())
+      if (!searchMatch) return false
       if (selectedCategory && post.category !== selectedCategory) return false
       if (selectedTag && !(post.tags ?? []).includes(selectedTag)) return false
       return true
     })
   }, [posts, search, selectedCategory, selectedTag])
 
-  const handleExploreStoryScroll = () => {
+  const scrollToStories = () => {
     storyScrollRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
@@ -45,18 +44,18 @@ export default function HomeClient({
         <div className="space-y-4">
           <p className="text-xs uppercase tracking-[0.5em] text-peat/60">Röst</p>
           <h1 className="text-4xl font-semibold leading-tight text-peat sm:text-5xl">
-            A pastel-hued storytelling space for every voice.
+            A space for every voice.
           </h1>
           <p className="text-lg text-peat/70">
-            Create, share, and comment on essays, micro-stories, and journal entries with a free, open
-            signup. Röst stays classy but approachable—just bring the words.
+            Create, share, and comment on essays, micro-stories, and journal entries with a free, open signup.
+            Röst stays classy but approachable—just bring the words.
           </p>
           <div className="flex flex-wrap gap-3">
             <ThemeToggle />
             <button
               type="button"
+              onClick={scrollToStories}
               className="rounded-3xl border border-peat/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-peat"
-              onClick={handleExploreStoryScroll}
             >
               Explore the story scroll
             </button>
@@ -65,9 +64,8 @@ export default function HomeClient({
         <div className="rounded-3xl border border-white/40 bg-white/80 p-6 text-sm leading-relaxed text-peat/70 shadow-lg shadow-peat/10">
           <p className="text-xl font-semibold text-peat">Röst is open for all</p>
           <p className="mt-3 text-sm">
-            Sign up with email, share multiple posts, tag them with mood, category, and drop thinks for
-            others to comment on. The backend runs on Supabase (free tier) while the interface is served
-            from Vercel/Cloudflare with a curated pastel palette.
+            Sign up with email, share multiple posts, tag them with mood, category, and drop thoughts for others to comment on.
+            The backend runs on Supabase (free tier) while the interface is served from Vercel/Cloudflare with a curated pastel palette.
           </p>
         </div>
       </header>
@@ -76,8 +74,8 @@ export default function HomeClient({
         categories={categories}
         tags={tags}
         onSearch={setSearch}
-        onCategoryChange={(value) => setSelectedCategory(value)}
-        onTagChange={(value) => setSelectedTag(value)}
+        onCategoryChange={setSelectedCategory}
+        onTagChange={setSelectedTag}
       />
 
       <div ref={storyScrollRef} className="grid gap-6 lg:grid-cols-[repeat(2,minmax(0,1fr))]">

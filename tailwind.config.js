@@ -8,13 +8,13 @@ module.exports = {
         serif: ['Playfair Display', 'serif']
       },
       colors: {
-        rosty: '#F6F1F3',
-        dawn: '#FDEFF5',
-        mist: '#EFF0F6',
-        peat: '#1B223A',
-        ember: '#F25D94',
-        sage: '#A8D3B0',
-        gold: '#FFC857'
+        rosty: '#e4f7f3',
+        dawn: '#c8eafb',
+        mist: '#f5f8e4',
+        peat: '#0e1c2f',
+        ember: '#79c5ff',
+        sage: '#86d6c2',
+        gold: '#ffe78d'
       }
     }
   },

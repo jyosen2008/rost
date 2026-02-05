@@ -4,18 +4,18 @@
 
 :root {
   color-scheme: light;
-  --rast-bg: #f6f1f3;
-  --rast-text: #1b223a;
-  --rast-panel: rgba(255, 255, 255, 0.9);
-  --rast-border: rgba(255, 255, 255, 0.4);
+  --rast-bg: #e4f7f3;
+  --rast-text: #061523;
+  --rast-panel: rgba(255, 255, 255, 0.95);
+  --rast-border: rgba(13, 68, 58, 0.12);
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --rast-bg: #04050d;
-  --rast-text: #f6f6ff;
-  --rast-panel: rgba(22, 25, 37, 0.85);
-  --rast-border: rgba(255, 255, 255, 0.15);
+  --rast-bg: #030b16;
+  --rast-text: #f8fbff;
+  --rast-panel: rgba(8, 18, 33, 0.92);
+  --rast-border: rgba(255, 255, 255, 0.18);
 }
 
 body {
@@ -37,12 +37,14 @@ a {
 
 :root[data-theme='dark'] .border-white\/40,
 :root[data-theme='dark'] .border-white\/30,
-:root[data-theme='dark'] .border-white\/10 {
+:root[data-theme='dark'] .border-white\/10,
+:root[data-theme='dark'] .border-white\/80 {
   border-color: var(--rast-border) !important;
 }
 
 :root[data-theme='dark'] .text-peat\/70,
 :root[data-theme='dark'] .text-peat\/60,
-:root[data-theme='dark'] .text-peat\/40 {
-  color: rgba(246, 246, 255, 0.85) !important;
+:root[data-theme='dark'] .text-peat\/40,
+:root[data-theme='dark'] .text-peat\/50 {
+  color: rgba(255, 255, 255, 0.85) !important;
 }
