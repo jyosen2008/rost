@@ -14,8 +14,8 @@
   color-scheme: dark;
   --rast-bg: #030b16;
   --rast-text: #f8fbff;
-  --rast-panel: rgba(8, 18, 33, 0.92);
-  --rast-border: rgba(255, 255, 255, 0.18);
+  --rast-panel: rgba(8, 18, 33, 0.96);
+  --rast-border: rgba(255, 255, 255, 0.28);
 }
 
 body {
@@ -31,20 +31,36 @@ a {
 :root[data-theme='dark'] .bg-white\/80,
 :root[data-theme='dark'] .bg-white\/60,
 :root[data-theme='dark'] .bg-white\/50,
-:root[data-theme='dark'] .bg-white {
+:root[data-theme='dark'] .bg-white,
+:root[data-theme='dark'] .bg-amber\/10,
+:root[data-theme='dark'] .bg-amber\/20 {
   background-color: var(--rast-panel) !important;
 }
 
 :root[data-theme='dark'] .border-white\/40,
 :root[data-theme='dark'] .border-white\/30,
 :root[data-theme='dark'] .border-white\/10,
-:root[data-theme='dark'] .border-white\/80 {
+:root[data-theme='dark'] .border-white\/80,
+:root[data-theme='dark'] .border-peat\/20,
+:root[data-theme='dark'] .border-peat\/10 {
   border-color: var(--rast-border) !important;
 }
 
+:root[data-theme='dark'] .text-peat,
+:root[data-theme='dark'] .text-peat\/90,
 :root[data-theme='dark'] .text-peat\/70,
 :root[data-theme='dark'] .text-peat\/60,
-:root[data-theme='dark'] .text-peat\/40,
-:root[data-theme='dark'] .text-peat\/50 {
-  color: rgba(255, 255, 255, 0.85) !important;
+:root[data-theme='dark'] .text-peat\/50,
+:root[data-theme='dark'] .text-peat\/40 {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] textarea,
+:root[data-theme='dark'] select {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+:root[data-theme='dark'] ::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
