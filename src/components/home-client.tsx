@@ -102,7 +102,9 @@ export default function HomeClient({
     )
   }
 
-  const clearMoodTags = () => setSelectedTags([])
+  const clearMoodTags = () => {
+    setSelectedTags([])
+  }
 
   return (
     <div className="space-y-10">
@@ -127,8 +129,8 @@ export default function HomeClient({
             </button>
           </div>
         </div>
-        <div className="rounded-3xl border border-white/40 bg-gradient-to-br from-white/90 to-slate-100 p-6 text-sm leading-relaxed text-peat/80 shadow-lg shadow-peat/10 dark:from-peat/80 dark:to-peat/60 dark:text-slate-100">
-          <p className="text-xl font-semibold text-peat dark:text-white">Röst is open for all</p>
+        <div className="rounded-3xl border border-white/40 bg-white/80 p-6 text-sm leading-relaxed text-peat/70 shadow-lg shadow-peat/10">
+          <p className="text-xl font-semibold text-peat">Röst is open for all</p>
           <p className="mt-3 text-sm">
             Sign up with email, share multiple posts, tag them with mood, category, and drop thoughts for others to comment on.
             The backend runs on Supabase (free tier) while the interface is served from Vercel/Cloudflare with a curated pastel palette.
@@ -192,7 +194,7 @@ export default function HomeClient({
               isBookmarked={bookmarks.includes(post.id)}
               onBookmarkToggle={() => toggleBookmark(post.id)}
             />
-          ))}
+          ))
         )}
       </div>
 

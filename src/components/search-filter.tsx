@@ -16,7 +16,7 @@ export default function SearchFilter({
   const [input, setInput] = useState('')
 
   return (
-    <div className="rounded-3xl border border-peat/10 bg-gradient-to-br from-white/95 to-slate-100 p-3 shadow-lg shadow-peat/10 dark:from-peat/95 dark:to-peat/70 dark:border-peat/20">
+    <section className="rounded-3xl border border-peat/10 bg-gradient-to-br from-white/95 to-slate-100 p-3 shadow-lg shadow-peat/10 dark:from-peat/95 dark:to-peat/70 dark:border-peat/20">
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
           type="search"
@@ -48,6 +48,6 @@ export default function SearchFilter({
           ))}
         </select>
       </div>
-    </div>
+    </section>
   )
 }
