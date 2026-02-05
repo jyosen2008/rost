@@ -1,5 +1,7 @@
 'use client'
 
+'use client'
+
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabaseClient } from '@/lib/supabase-client'
 
@@ -134,23 +136,25 @@ export default function LiveStats({
     : 'Updating…'
 
   return (
-    <section className="rounded-3xl border border-peat/10 bg-white/90 p-6 shadow-lg shadow-peat/10">
+    <section className="rounded-3xl border border-peat/10 bg-gradient-to-br from-white/95 to-slate-100 p-6 shadow-lg shadow-peat/20 dark:border-rose/40 dark:from-peat/90 dark:to-peat/70 dark:shadow-none">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.4em] text-peat/60">Live stats</p>
-          <h2 className="text-2xl font-semibold text-peat">The room at a glance</h2>
+          <p className="text-xs uppercase tracking-[0.4em] text-peat/60 dark:text-rose/200">Live stats</p>
+          <h2 className="text-2xl font-semibold text-peat dark:text-white">The room at a glance</h2>
         </div>
-        <span className="text-xs uppercase tracking-[0.4em] text-peat/40">{updatedLabel}</span>
+        <span className="text-xs uppercase tracking-[0.4em] text-peat/40 dark:text-rose/200">{updatedLabel}</span>
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {metrics.map((metric) => (
           <article
             key={metric.label}
-            className="rounded-2xl border border-peat/10 bg-peat/10 p-4 text-sm text-peat/70"
+            className="rounded-2xl border border-peat/20 bg-white/90 p-4 text-sm text-peat/70 shadow-inner shadow-peat/10 dark:border-peat/20 dark:bg-peat/30 dark:text-white"
           >
-            <p className="text-3xl font-semibold text-peat">{metric.value.toLocaleString()}</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.3em] text-peat/50">{metric.label}</p>
-            <p className="mt-1 text-xs text-peat/60">{metric.detail}</p>
+            <p className="text-3xl font-semibold text-peat dark:text-white">
+              {metric.value.toLocaleString()}
+            </p>
+            <p className="mt-1 text-xs uppercase tracking-[0.3em] text-peat/50 dark:text-rose/200">{metric.label}</p>
+            <p className="mt-1 text-xs text-peat/60 dark:text-rose/200">{metric.detail}</p>
           </article>
         ))}
       </div>
