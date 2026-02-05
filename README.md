@@ -1,6 +1,6 @@
 # Röst — Classy Community Blog
 
-Röst is a pastel-hued, open blogging playground built with Next.js, Tailwind CSS, Supabase, and Framer Motion. It is meant to be free-to-use, beautifully minimal, and entirely deployable on free tiers (Vercel, Supabase, freenom domain).
+Röst is a open blogging playground built with Next.js, Tailwind CSS, Supabase, and Framer Motion. It is meant to be free-to-use, beautifully minimal, and entirely deployable on free tiers (Vercel, Supabase, freenom domain).
 
 ## 1. Supabase setup
 
