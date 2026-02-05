@@ -15,6 +15,24 @@ import WriterSpotlight from './writer-spotlight'
 import { useBookmarks } from '@/hooks/use-bookmarks'
 import { LiveStatsSummary, Post } from '@/lib/db'
 
+const extraMoodTags = [
+  'Archive',
+  'Art',
+  'Notes',
+  'Reflection',
+  'Science',
+  'Letters',
+  'Night',
+  'Stillness',
+  'Dreams',
+  'Soundscape',
+  'Quietude',
+  'Memoir',
+  'Travel',
+  'Memory',
+  'Skyline'
+]
+
 export default function HomeClient({
   posts,
   categories,
@@ -31,6 +49,11 @@ export default function HomeClient({
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const storyScrollRef = useRef<HTMLDivElement>(null)
   const { bookmarks, toggleBookmark } = useBookmarks()
+
+  const moodTags = useMemo(() => {
+    const ordered = [...extraMoodTags, ...tags]
+    return Array.from(new Set(ordered))
+  }, [tags])
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
@@ -102,23 +125,27 @@ export default function HomeClient({
         </div>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[repeat(2,minmax(0,1fr))]">
-        <AuthPanel />
-        <PostCreator categories={categories} tags={tags} />
+      <div className="grid gap-6 lg:grid-cols-[0.65fr,1.35fr]">
+        <div className="flex lg:justify-start">
+          <AuthPanel />
+        </div>
+        <div className="w-full">
+          <PostCreator categories={categories} tags={tags} />
+        </div>
       </div>
 
       <FeaturedCarousel posts={featuredPosts} />
 
-      <div className="grid gap-6 lg:grid-cols-[1.3fr,0.7fr]">
-        <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[1.3fr,0.9fr]">
+        <div className="space-y-4">
           <SearchFilter
             categories={categories}
             onSearch={setSearch}
             onCategoryChange={setSelectedCategory}
           />
-          <TagPills tags={tags} selectedTag={selectedTag} onTagSelect={setSelectedTag} />
+          <TagPills tags={moodTags} selectedTag={selectedTag} onTagSelect={setSelectedTag} />
         </div>
-        <div className="space-y-6">
+        <div className="space-y-5">
           <WriterSpotlight
             topWriter={topWriter}
             otherWriters={otherWriters}

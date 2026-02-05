@@ -21,18 +21,18 @@ export default function StoryPromptWidget() {
   }
 
   return (
-    <section className="rounded-3xl border border-peat/10 bg-peat/10 p-6 text-sm text-peat/80 shadow-sm">
-      <div className="flex items-center justify-between text-xs uppercase tracking-[0.4em] text-peat/60">
+    <section className="rounded-3xl border border-peat/10 bg-peat/10 p-5 text-sm text-peat/80 shadow-sm">
+      <div className="flex items-center justify-between text-[0.65rem] uppercase tracking-[0.4em] text-peat/60">
         <span>Story prompt</span>
         <button
           type="button"
           onClick={refreshPrompt}
-          className="text-xs font-semibold uppercase tracking-[0.3em] text-peat/60"
+          className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-peat/60"
         >
           Inspire me
         </button>
       </div>
-      <p className="mt-4 text-base leading-relaxed text-peat/80">{prompt}</p>
+      <p className="mt-3 text-sm leading-relaxed text-peat/80">{prompt}</p>
     </section>
   )
 }
