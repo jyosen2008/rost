@@ -48,7 +48,7 @@ export default function LiveStats({
           supabaseClient.from('bookmarks').select('id', { head: true, count: 'exact' }),
           supabaseClient.from('categories').select('id', { head: true, count: 'exact' }),
           supabaseClient.from('tags').select('id', { head: true, count: 'exact' }),
-          supabaseClient.from('posts').select('author_name', { limit: 1000 })
+          supabaseClient.from('posts').select('author_name').range(0, 999)
         ])
 
       const uniqueAuthors = new Set<string>()
