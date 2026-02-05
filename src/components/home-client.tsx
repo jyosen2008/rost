@@ -46,7 +46,7 @@ export default function HomeClient({
 }) {
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const storyScrollRef = useRef<HTMLDivElement>(null)
   const { bookmarks, toggleBookmark } = useBookmarks()
 
@@ -65,10 +65,13 @@ export default function HomeClient({
         lowerExcerpt.includes(search.toLowerCase())
       if (!searchMatch) return false
       if (selectedCategory && post.category !== selectedCategory) return false
-      if (selectedTag && !(post.tags ?? []).includes(selectedTag)) return false
+      if (selectedTags.length > 0) {
+        const postTags = post.tags ?? []
+        if (!selectedTags.some((tag) => postTags.includes(tag))) return false
+      }
       return true
     })
-  }, [posts, search, selectedCategory, selectedTag])
+  }, [posts, search, selectedCategory, selectedTags])
 
   const featuredPosts = useMemo(() => posts.filter((post) => post.cover_url).slice(0, 6), [posts])
 
@@ -93,6 +96,14 @@ export default function HomeClient({
     storyScrollRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const toggleMoodTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((current) => current !== tag) : [...prev, tag]
+    )
+  }
+
+  const clearMoodTags = () => setSelectedTags([])
+
   return (
     <div className="space-y-10">
       <header className="grid gap-6 lg:grid-cols-[1.4fr,0.6fr]">
@@ -116,8 +127,8 @@ export default function HomeClient({
             </button>
           </div>
         </div>
-        <div className="rounded-3xl border border-white/40 bg-white/80 p-6 text-sm leading-relaxed text-peat/70 shadow-lg shadow-peat/10">
-          <p className="text-xl font-semibold text-peat">Röst is open for all</p>
+        <div className="rounded-3xl border border-white/40 bg-gradient-to-br from-white/90 to-slate-100 p-6 text-sm leading-relaxed text-peat/80 shadow-lg shadow-peat/10 dark:from-peat/80 dark:to-peat/60 dark:text-slate-100">
+          <p className="text-xl font-semibold text-peat dark:text-white">Röst is open for all</p>
           <p className="mt-3 text-sm">
             Sign up with email, share multiple posts, tag them with mood, category, and drop thoughts for others to comment on.
             The backend runs on Supabase (free tier) while the interface is served from Vercel/Cloudflare with a curated pastel palette.
@@ -143,7 +154,12 @@ export default function HomeClient({
             onSearch={setSearch}
             onCategoryChange={setSelectedCategory}
           />
-          <TagPills tags={moodTags} selectedTag={selectedTag} onTagSelect={setSelectedTag} />
+          <TagPills
+            tags={moodTags}
+            selectedTags={selectedTags}
+            onTagToggle={toggleMoodTag}
+            onClear={clearMoodTags}
+          />
         </div>
         <div className="space-y-5">
           <WriterSpotlight
@@ -176,7 +192,7 @@ export default function HomeClient({
               isBookmarked={bookmarks.includes(post.id)}
               onBookmarkToggle={() => toggleBookmark(post.id)}
             />
-          ))
+          ))}
         )}
       </div>
 

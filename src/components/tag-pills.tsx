@@ -2,35 +2,36 @@
 
 type TagPillsProps = {
   tags: string[]
-  selectedTag: string | null
-  onTagSelect: (tag: string | null) => void
+  selectedTags: string[]
+  onTagToggle: (tag: string) => void
+  onClear: () => void
 }
 
-export default function TagPills({ tags, selectedTag, onTagSelect }: TagPillsProps) {
+export default function TagPills({ tags, selectedTags, onTagToggle, onClear }: TagPillsProps) {
   return (
-    <div className="rounded-3xl border border-peat/10 bg-white/80 p-3 shadow-sm">
+    <div className="rounded-3xl border border-peat/10 bg-gradient-to-br from-white/90 to-peat/5 p-3 shadow-sm shadow-peat/10 dark:from-peat/90 dark:to-peat/80 dark:border-peat/30">
       <div className="flex items-center justify-between">
-        <p className="text-[0.6rem] uppercase tracking-[0.4em] text-peat/70">Mood tags</p>
+        <p className="text-[0.65rem] uppercase tracking-[0.4em] text-peat/70 dark:text-rose/200">Mood tags</p>
         <button
           type="button"
-          onClick={() => onTagSelect(null)}
-          className="text-[0.55rem] font-semibold uppercase tracking-[0.3em] text-peat/60"
+          onClick={onClear}
+          className="text-[0.55rem] font-semibold uppercase tracking-[0.3em] text-peat/60 dark:text-rose/100"
         >
           Clear all
         </button>
       </div>
       <div className="mt-2 flex flex-wrap gap-2">
         {tags.map((tag) => {
-          const isActive = selectedTag === tag
+          const isActive = selectedTags.includes(tag)
           return (
             <button
               key={tag}
               type="button"
-              onClick={() => onTagSelect(isActive ? null : tag)}
-              className={`rounded-full border px-2 py-1 text-[0.55rem] font-semibold uppercase tracking-[0.3em] transition ${
+              onClick={() => onTagToggle(tag)}
+              className={`rounded-full border px-3 py-1 text-[0.55rem] font-semibold uppercase tracking-[0.3em] transition ${
                 isActive
-                  ? 'border-ember bg-ember/10 text-ember'
-                  : 'border-white/40 bg-white/60 text-peat/70 hover:border-sage/50'
+                  ? 'border-ember text-ember shadow-[0_0_0_1px_rgba(255,255,255,0.8)]'
+                  : 'border-white/60 bg-white/80 text-peat/70 shadow-[0_0_0_1px_rgba(255,255,255,0.2)] dark:border-rose/40 dark:bg-peat/80 dark:text-rose/200'
               }`}
             >
               {tag}

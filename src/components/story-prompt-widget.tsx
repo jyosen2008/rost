@@ -21,18 +21,21 @@ export default function StoryPromptWidget() {
   }
 
   return (
-    <section className="rounded-3xl border border-peat/10 bg-peat/10 p-5 text-sm text-peat/80 shadow-sm">
-      <div className="flex items-center justify-between text-[0.65rem] uppercase tracking-[0.4em] text-peat/60">
-        <span>Story prompt</span>
+    <section className="rounded-3xl border border-peat/10 bg-gradient-to-br from-white/90 via-slate-50 to-sage/20 p-5 text-sm text-peat/80 shadow-sm shadow-peat/40 dark:from-peat/90 dark:via-peat/80 dark:to-peat/70 dark:border-rose/30 dark:text-rose/100">
+      <div className="flex items-center justify-between">
+        <p className="text-[0.65rem] uppercase tracking-[0.4em]">Story prompt</p>
         <button
           type="button"
           onClick={refreshPrompt}
-          className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-peat/60"
+          className="rounded-full border border-peat/50 px-4 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-peat/70 transition hover:border-ember hover:text-ember dark:border-rose/60 dark:text-rose/200"
         >
           Inspire me
         </button>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-peat/80">{prompt}</p>
+      <p className="mt-3 text-base leading-relaxed text-peat dark:text-white">{prompt}</p>
+      <p className="mt-3 text-[0.65rem] uppercase tracking-[0.4em] text-peat/60 dark:text-rose/200">
+        Swipe for a fresh spark anytime.
+      </p>
     </section>
   )
 }
