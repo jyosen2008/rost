@@ -89,7 +89,7 @@ export async function getComments(postId: string) {
     .eq('post_id', postId)
     .order('created_at', { ascending: true })
   if (error) {
-    console.error(error)
+    console.error('Fetching comments failed', error)
     return []
   }
   return data

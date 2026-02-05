@@ -108,7 +108,10 @@ export default function PostCard({
         </div>
         <div className="text-sm font-light text-peat/60">
           By{' '}
-          <Link href={`/profiles/${post.author_id ?? post.author_name ?? 'guest'}`} className="underline">
+          <Link
+            href={`/profiles/${(post.author_name ?? 'guest').toLowerCase().replace(/\s+/g, '-')}`}
+            className="underline"
+          >
             {post.author_name ?? 'a Röst writer'}
           </Link>
         </div>
