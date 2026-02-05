@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import AuthPanel from './auth-panel'
 import PostCard from './post-card'
 import PostCreator from './post-creator'
@@ -20,6 +20,7 @@ export default function HomeClient({
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const storyScrollRef = useRef<HTMLDivElement>(null)
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
@@ -33,6 +34,10 @@ export default function HomeClient({
       return true
     })
   }, [posts, search, selectedCategory, selectedTag])
+
+  const handleExploreStoryScroll = () => {
+    storyScrollRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
     <div className="space-y-10">
@@ -48,7 +53,11 @@ export default function HomeClient({
           </p>
           <div className="flex flex-wrap gap-3">
             <ThemeToggle />
-            <button className="rounded-3xl border border-peat/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-peat">
+            <button
+              type="button"
+              className="rounded-3xl border border-peat/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-peat"
+              onClick={handleExploreStoryScroll}
+            >
               Explore the story scroll
             </button>
           </div>
@@ -71,7 +80,7 @@ export default function HomeClient({
         onTagChange={(value) => setSelectedTag(value)}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[repeat(2,minmax(0,1fr))]">
+      <div ref={storyScrollRef} className="grid gap-6 lg:grid-cols-[repeat(2,minmax(0,1fr))]">
         {filteredPosts.length === 0 ? (
           <p className="text-peat/60">No posts match your filters yet.</p>
         ) : (

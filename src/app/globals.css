@@ -4,14 +4,45 @@
 
 :root {
   color-scheme: light;
+  --rast-bg: #f6f1f3;
+  --rast-text: #1b223a;
+  --rast-panel: rgba(255, 255, 255, 0.9);
+  --rast-border: rgba(255, 255, 255, 0.4);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --rast-bg: #04050d;
+  --rast-text: #f6f6ff;
+  --rast-panel: rgba(22, 25, 37, 0.85);
+  --rast-border: rgba(255, 255, 255, 0.15);
 }
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #f6f1f3;
-  color: #1b223a;
+  background-color: var(--rast-bg) !important;
+  color: var(--rast-text);
 }
 
 a {
   color: inherit;
+}
+
+:root[data-theme='dark'] .bg-white\/80,
+:root[data-theme='dark'] .bg-white\/60,
+:root[data-theme='dark'] .bg-white\/50,
+:root[data-theme='dark'] .bg-white {
+  background-color: var(--rast-panel) !important;
+}
+
+:root[data-theme='dark'] .border-white\/40,
+:root[data-theme='dark'] .border-white\/30,
+:root[data-theme='dark'] .border-white\/10 {
+  border-color: var(--rast-border) !important;
+}
+
+:root[data-theme='dark'] .text-peat\/70,
+:root[data-theme='dark'] .text-peat\/60,
+:root[data-theme='dark'] .text-peat\/40 {
+  color: rgba(246, 246, 255, 0.85) !important;
 }
