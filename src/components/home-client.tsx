@@ -102,16 +102,12 @@ export default function HomeClient({
         </div>
       </header>
 
-      <FeaturedCarousel posts={featuredPosts} />
+      <div className="grid gap-6 lg:grid-cols-[repeat(2,minmax(0,1fr))]">
+        <AuthPanel />
+        <PostCreator categories={categories} tags={tags} />
+      </div>
 
-      <LiveStats
-        postsCount={liveStats.totalPosts}
-        commentsCount={liveStats.totalComments}
-        bookmarksCount={liveStats.totalBookmarks}
-        categoriesCount={categories.length}
-        tagsCount={tags.length}
-        authorsCount={writerStats.length}
-      />
+      <FeaturedCarousel posts={featuredPosts} />
 
       <div className="grid gap-6 lg:grid-cols-[1.3fr,0.7fr]">
         <div className="space-y-6">
@@ -157,10 +153,14 @@ export default function HomeClient({
         )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr,1fr]">
-        <AuthPanel />
-        <PostCreator categories={categories} tags={tags} />
-      </div>
+      <LiveStats
+        postsCount={liveStats.totalPosts}
+        commentsCount={liveStats.totalComments}
+        bookmarksCount={liveStats.totalBookmarks}
+        categoriesCount={categories.length}
+        tagsCount={tags.length}
+        authorsCount={writerStats.length}
+      />
     </div>
   )
 }

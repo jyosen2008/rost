@@ -11,12 +11,13 @@ const prompts = [
   'Capture the feeling of arriving somewhere hours before the rest of the world wakes up.'
 ]
 
+const getRandomPrompt = () => prompts[Math.floor(Math.random() * prompts.length)]
+
 export default function StoryPromptWidget() {
-  const [prompt, setPrompt] = useState(prompts[0])
+  const [prompt, setPrompt] = useState(getRandomPrompt)
 
   const refreshPrompt = () => {
-    const next = prompts[Math.floor(Math.random() * prompts.length)]
-    setPrompt(next)
+    setPrompt(getRandomPrompt())
   }
 
   return (

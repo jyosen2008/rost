@@ -38,25 +38,25 @@ export default function AuthPanel() {
   }
 
   return (
-    <section className="rounded-3xl border border-peat/10 bg-peat/10 p-6 shadow-lg">
-      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-peat/60">
+    <section className="w-full max-w-[360px] rounded-3xl border border-peat/10 bg-peat/10 p-5 shadow-lg shadow-peat/10">
+      <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.35em] text-peat/60">
         <span>Join Röst</span>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => setMode('signup')}
-            className={`rounded-full px-4 py-1 text-xs font-semibold transition ${
+            className={`rounded-full px-3 py-1 text-[0.65rem] font-semibold transition ${
               mode === 'signup'
                 ? 'bg-peat text-white'
                 : 'bg-white text-peat/70 hover:text-peat'
             }`}
           >
-            Sign up
+            Join
           </button>
           <button
             type="button"
             onClick={() => setMode('login')}
-            className={`rounded-full px-4 py-1 text-xs font-semibold transition ${
+            className={`rounded-full px-3 py-1 text-[0.65rem] font-semibold transition ${
               mode === 'login'
                 ? 'bg-peat text-white'
                 : 'bg-white text-peat/70 hover:text-peat'
@@ -67,35 +67,36 @@ export default function AuthPanel() {
         </div>
       </div>
 
-      <div className="mt-4 space-y-4">
-        <p className="text-xs uppercase tracking-[0.3em] text-peat/60">Email login only</p>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="Email"
-            required
-            className="rounded-2xl border border-white/30 bg-white/50 px-4 py-3 text-base text-peat placeholder:text-peat/50 focus:border-ember focus:outline-none"
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Password"
-            required
-            className="rounded-2xl border border-white/30 bg-white/50 px-4 py-3 text-base text-peat placeholder:text-peat/50 focus:border-ember focus:outline-none"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-2xl bg-ember px-4 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white"
-          >
-            {mode === 'login' ? 'Login' : 'Create account'}
-          </button>
-          {message ? <p className="text-sm text-peat/70">{message}</p> : null}
-        </form>
-      </div>
+      <p className="mt-3 text-xs uppercase tracking-[0.3em] text-peat/60">
+        {mode === 'login' ? 'Return with email' : 'Create an email account'}
+      </p>
+
+      <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
+        <input
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="Email"
+          required
+          className="rounded-2xl border border-white/30 bg-white/60 px-4 py-3 text-sm text-peat placeholder:text-peat/60 focus:border-ember focus:outline-none"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="Password"
+          required
+          className="rounded-2xl border border-white/30 bg-white/60 px-4 py-3 text-sm text-peat placeholder:text-peat/60 focus:border-ember focus:outline-none"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-1 rounded-2xl bg-ember px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white"
+        >
+          {mode === 'login' ? 'Login' : 'Create account'}
+        </button>
+        {message ? <p className="text-xs text-peat/60">{message}</p> : null}
+      </form>
     </section>
   )
 }
