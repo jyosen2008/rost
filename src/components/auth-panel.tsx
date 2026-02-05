@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import { supabaseClient } from '@/lib/supabase-client'
 
 type FormMode = 'login' | 'signup'
@@ -29,7 +29,7 @@ export default function AuthPanel() {
     })
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoading(true)
     setMessage(null)
@@ -96,7 +96,7 @@ export default function AuthPanel() {
               type="text"
               value={handleValue}
               onChange={(event) => setHandleValue(event.target.value)}
-              placeholder="Handle (e.g. @story")
+              placeholder="Handle (e.g. @story)"
               required
               className="rounded-2xl border border-white/30 bg-white/60 px-4 py-3 text-sm text-peat placeholder:text-peat/60 focus:border-ember focus:outline-none"
             />
