@@ -48,11 +48,12 @@ a {
 
 :root[data-theme='dark'] .text-peat,
 :root[data-theme='dark'] .text-peat\/90,
+:root[data-theme='dark'] .text-peat\/80,
 :root[data-theme='dark'] .text-peat\/70,
 :root[data-theme='dark'] .text-peat\/60,
 :root[data-theme='dark'] .text-peat\/50,
 :root[data-theme='dark'] .text-peat\/40 {
-  color: rgba(255, 255, 255, 0.92) !important;
+  color: rgba(255, 255, 255, 0.96) !important;
 }
 
 :root[data-theme='dark'] input,
