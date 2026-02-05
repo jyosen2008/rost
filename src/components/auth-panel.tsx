@@ -9,8 +9,25 @@ export default function AuthPanel() {
   const [mode, setMode] = useState<FormMode>('signup')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [handleValue, setHandleValue] = useState('')
+  const [displayName, setDisplayName] = useState('')
   const [message, setMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  const saveProfile = async (userId: string) => {
+    const normalizedHandle = handleValue.trim().replace(/^@/, '').toLowerCase()
+    if (!normalizedHandle) {
+      setMessage('Please pick a handle to continue.')
+      return
+    }
+    const nameToSave = displayName.trim() || 'a Röst storyteller'
+    await supabaseClient.from('profiles').upsert({
+      user_id: userId,
+      handle: normalizedHandle,
+      display_name: nameToSave,
+      bio: ''
+    })
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -18,10 +35,11 @@ export default function AuthPanel() {
     setMessage(null)
     try {
       if (mode === 'signup') {
-        const { error } = await supabaseClient.auth.signUp({ email, password })
+        const { data, error } = await supabaseClient.auth.signUp({ email, password })
         if (error) {
           setMessage(error.message)
-        } else {
+        } else if (data?.user?.id) {
+          await saveProfile(data.user.id)
           setMessage('Check your email for a confirmation link.')
         }
       } else {
@@ -72,6 +90,26 @@ export default function AuthPanel() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
+        {mode === 'signup' && (
+          <>
+            <input
+              type="text"
+              value={handleValue}
+              onChange={(event) => setHandleValue(event.target.value)}
+              placeholder="Handle (e.g. @story")
+              required
+              className="rounded-2xl border border-white/30 bg-white/60 px-4 py-3 text-sm text-peat placeholder:text-peat/60 focus:border-ember focus:outline-none"
+            />
+            <input
+              type="text"
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="Display name"
+              required
+              className="rounded-2xl border border-white/30 bg-white/60 px-4 py-3 text-sm text-peat placeholder:text-peat/60 focus:border-ember focus:outline-none"
+            />
+          </>
+        )}
         <input
           type="email"
           value={email}
