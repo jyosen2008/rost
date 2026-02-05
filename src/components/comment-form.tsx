@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { addCommentAction } from '@/lib/db'
+import { addCommentAction } from '@/actions/posts'
 
 export default function CommentForm({ postId }: { postId: string }) {
   const [name, setName] = useState('')
