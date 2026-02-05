@@ -9,9 +9,19 @@ type PostCardProps = {
   post: Post
   isBookmarked?: boolean
   onBookmarkToggle?: () => void
+  likeCount?: number
+  liked?: boolean
+  onToggleLike?: () => void
 }
 
-export default function PostCard({ post, isBookmarked = false, onBookmarkToggle }: PostCardProps) {
+export default function PostCard({
+  post,
+  isBookmarked = false,
+  onBookmarkToggle,
+  likeCount = 0,
+  liked = false,
+  onToggleLike
+}: PostCardProps) {
   return (
     <motion.article
       whileHover={{ y: -4 }}
@@ -46,32 +56,62 @@ export default function PostCard({ post, isBookmarked = false, onBookmarkToggle 
           </span>
         ))}
       </div>
-      <div className="mt-6 flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-3">
-          {typeof onBookmarkToggle === 'function' ? (
+      <div className="mt-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={onBookmarkToggle}
-              className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] transition ${
-                isBookmarked
-                  ? 'border-ember/70 bg-ember/10 text-ember'
-                  : 'border-white/40 text-peat/70 hover:border-peat/60'
-              }`}
+              onClick={onToggleLike}
+              disabled={!onToggleLike}
+              className={`flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.3em] transition ${
+                liked
+                  ? 'text-ember'
+                  : 'text-peat/60 hover:text-peat'
+              } ${!onToggleLike ? 'cursor-not-allowed text-peat/30' : ''}`}
             >
-              <span aria-hidden="true" className="text-xs">
-                {isBookmarked ? '★' : '☆'}
+              <span aria-hidden="true" className="text-lg">
+                {liked ? '♥' : '♡'}
               </span>
-              <span>{isBookmarked ? 'Saved' : 'Bookmark'}</span>
+              <span>{likeCount.toLocaleString()}</span>
             </button>
-          ) : null}
-          <Link
-            href={`/posts/${post.slug ?? post.id}`}
-            className="text-sm font-semibold uppercase tracking-[0.3em] text-ember"
-          >
-            Read
+            <Link
+              href={`/posts/${post.slug ?? post.id}#discussion`}
+              className="text-peat/60 underline underline-offset-4"
+            >
+              Comment
+            </Link>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {typeof onBookmarkToggle === 'function' ? (
+              <button
+                type="button"
+                onClick={onBookmarkToggle}
+                className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+                  isBookmarked
+                    ? 'border-ember/70 bg-ember/10 text-ember'
+                    : 'border-white/40 text-peat/70 hover:border-peat/60'
+                }`}
+              >
+                <span aria-hidden="true" className="text-xs">
+                  {isBookmarked ? '★' : '☆'}
+                </span>
+                <span>{isBookmarked ? 'Saved' : 'Bookmark'}</span>
+              </button>
+            ) : null}
+            <Link
+              href={`/posts/${post.slug ?? post.id}`}
+              className="text-sm font-semibold uppercase tracking-[0.3em] text-ember"
+            >
+              Read
+            </Link>
+          </div>
+        </div>
+        <div className="text-sm font-light text-peat/60">
+          By{' '}
+          <Link href={`/profiles/${post.author_id ?? post.author_name ?? 'guest'}`} className="underline">
+            {post.author_name ?? 'a Röst writer'}
           </Link>
         </div>
-        <span className="text-sm font-light text-peat/60">By {post.author_name ?? 'a Röst writer'}</span>
       </div>
     </motion.article>
   )

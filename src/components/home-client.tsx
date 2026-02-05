@@ -12,6 +12,8 @@ import StoryPromptWidget from './story-prompt-widget'
 import TagPills from './tag-pills'
 import ThemeToggle from './theme-toggle'
 import WriterSpotlight from './writer-spotlight'
+import Link from 'next/link'
+import { usePostInteractions } from '@/hooks/use-post-interactions'
 import { useBookmarks } from '@/hooks/use-bookmarks'
 import { LiveStatsSummary, Post } from '@/lib/db'
 
@@ -96,6 +98,9 @@ export default function HomeClient({
     storyScrollRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const postIds = useMemo(() => posts.map((post) => post.id), [posts])
+  const interactions = usePostInteractions(postIds)
+
   const toggleMoodTag = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((current) => current !== tag) : [...prev, tag]
@@ -127,6 +132,12 @@ export default function HomeClient({
             >
               Explore the story scroll
             </button>
+            <Link
+              href="/profile"
+              className="rounded-3xl border border-white/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-peat hover:border-peat"
+            >
+              My profile
+            </Link>
           </div>
         </div>
         <div className="rounded-3xl border border-white/40 bg-gradient-to-br from-white/90 to-slate-100 p-6 text-sm leading-relaxed text-peat/80 shadow-lg shadow-peat/10 dark:from-peat/80 dark:to-peat/60 dark:text-slate-100">
