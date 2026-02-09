@@ -26,12 +26,12 @@ export default function Landing() {
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr,0.85fr]">
         <div className="space-y-5">
-          <p className="text-xs uppercase tracking-[0.5em] text-[var(--text-muted)]">Rost</p>
+          <p className="text-xs uppercase tracking-[0.5em] text-[var(--text-subtle)]">Röst</p>
           <h1 className="text-4xl font-semibold leading-tight text-[var(--text-primary)] sm:text-6xl">
             Reflections, opinions, stories, thoughts.
           </h1>
           <p className="max-w-xl text-lg text-[var(--text-muted)]">
-            A calm place to write, follow people you like, and keep a personal feed of what you actually want to read.
+            A pastel-blue sanctuary for writing, sharing, and following the voices you care about.
           </p>
           <div className="flex flex-wrap gap-3">
             <ThemeToggle />
@@ -45,18 +45,8 @@ export default function Landing() {
         </div>
 
         <div id="auth" className="flex w-full justify-center">
-          {/* Avoid layout jump while hydrating */}
           {mounted ? <AuthPanel /> : <div className="h-[340px] w-[360px] rounded-3xl bg-[var(--panel-bg)]" />}
         </div>
-      </div>
-
-      <div className="relative mx-auto mt-10 max-w-6xl rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-5 text-sm text-[var(--text-muted)] shadow-sm shadow-black/10">
-        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">What you get after login</p>
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-[var(--text-muted)]">
-          <li>Profile dashboard with followers / following + post count</li>
-          <li>Create post popup (no leaving the dashboard)</li>
-          <li>Home feed prioritized by who you follow + what you read</li>
-        </ul>
       </div>
     </div>
   )

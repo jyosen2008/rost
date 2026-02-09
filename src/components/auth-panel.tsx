@@ -21,7 +21,7 @@ export default function AuthPanel() {
       setMessage('Please pick a handle to continue.')
       return
     }
-    const nameToSave = displayName.trim() || 'a RAst storyteller'
+    const nameToSave = displayName.trim() || 'a Röst storyteller'
     await supabaseClient.from('profiles').upsert({
       user_id: userId,
       handle: normalizedHandle,
@@ -48,7 +48,7 @@ export default function AuthPanel() {
         if (error) {
           setMessage(error.message)
         } else {
-          setMessage('Welcome back to RAst!')
+          setMessage('Welcome back to Röst!')
         }
       }
     } finally {
@@ -59,7 +59,7 @@ export default function AuthPanel() {
   return (
     <section className="glass-panel w-full max-w-[360px] px-5 py-6 shadow-lg shadow-black/20">
       <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.35em] text-[var(--text-muted)]">
-        <span>Join RAst</span>
+        <span>Join Röst</span>
         <div className="flex gap-2">
           <button
             type="button"

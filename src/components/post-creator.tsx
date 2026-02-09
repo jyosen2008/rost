@@ -190,7 +190,7 @@ export default function PostCreator({ categories, tags }: PostCreatorProps) {
           disabled={loading}
           className="rounded-3xl bg-[var(--accent)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white"
         >
-          {loading ? 'Publishing…' : 'Share with RAst'}
+          {loading ? 'Publishing…' : 'Share with Röst'}
         </button>
         {status ? <p className="text-sm text-[var(--text-muted)]">{status}</p> : null}
       </form>
