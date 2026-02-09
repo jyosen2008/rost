@@ -1,7 +1,5 @@
 'use client'
 
-'use client'
-
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabaseClient } from '@/lib/supabase-client'
 
@@ -50,14 +48,8 @@ export default function LiveStats({
           supabaseClient.from('bookmarks').select('id', { head: true, count: 'exact' }),
           supabaseClient.from('categories').select('id', { head: true, count: 'exact' }),
           supabaseClient.from('tags').select('id', { head: true, count: 'exact' }),
-          supabaseClient.from('posts').select('author_name').range(0, 999)
+          supabaseClient.from('profiles').select('user_id', { head: true, count: 'exact' })
         ])
-
-      const uniqueAuthors = new Set<string>()
-      ;(authorsResult.data ?? []).forEach((row) => {
-        const name = row.author_name?.trim()
-        if (name) uniqueAuthors.add(name)
-      })
 
       setStats((prev) => ({
         postsCount: postsResult.count ?? prev.postsCount,
@@ -65,7 +57,7 @@ export default function LiveStats({
         bookmarksCount: bookmarksResult.count ?? prev.bookmarksCount,
         categoriesCount: categoriesResult.count ?? prev.categoriesCount,
         tagsCount: tagsResult.count ?? prev.tagsCount,
-        authorsCount: uniqueAuthors.size > 0 ? uniqueAuthors.size : prev.authorsCount
+        authorsCount: authorsResult.count ?? prev.authorsCount
       }))
       setLastUpdated(new Date())
     } catch (error) {
@@ -78,7 +70,7 @@ export default function LiveStats({
   }, [refreshStats])
 
   useEffect(() => {
-    const tables = ['posts', 'comments', 'bookmarks', 'categories', 'tags']
+    const tables = ['posts', 'comments', 'bookmarks', 'categories', 'tags', 'profiles']
     const channels = tables.map((table) =>
       supabaseClient
         .channel(`live-stats-${table}`)
@@ -136,25 +128,25 @@ export default function LiveStats({
     : 'Updating…'
 
   return (
-    <section className="rounded-3xl border border-peat/10 bg-gradient-to-br from-white/95 to-slate-100 p-6 shadow-lg shadow-peat/20 dark:border-rose/40 dark:from-peat/90 dark:to-peat/70 dark:shadow-none">
+    <section className="rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-6 shadow-lg shadow-black/20">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.4em] text-peat/60 dark:text-rose/200">Live stats</p>
-          <h2 className="text-2xl font-semibold text-peat dark:text-white">The room at a glance</h2>
+          <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Live stats</p>
+          <h2 className="text-2xl font-semibold text-[var(--text-primary)]">The room at a glance</h2>
         </div>
-        <span className="text-xs uppercase tracking-[0.4em] text-peat/40 dark:text-rose/200">{updatedLabel}</span>
+        <span className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">{updatedLabel}</span>
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {metrics.map((metric) => (
           <article
             key={metric.label}
-            className="rounded-2xl border border-peat/20 bg-white/90 p-4 text-sm text-peat/70 shadow-inner shadow-peat/10 dark:border-peat/20 dark:bg-peat/30 dark:text-white"
+            className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-sm text-[var(--text-muted)] shadow-inner shadow-black/10"
           >
-            <p className="text-3xl font-semibold text-peat dark:text-white">
+            <p className="text-3xl font-semibold text-[var(--text-primary)]">
               {metric.value.toLocaleString()}
             </p>
-            <p className="mt-1 text-xs uppercase tracking-[0.3em] text-peat/50 dark:text-rose/200">{metric.label}</p>
-            <p className="mt-1 text-xs text-peat/60 dark:text-rose/200">{metric.detail}</p>
+            <p className="mt-1 text-xs uppercase tracking-[0.3em] text-[var(--text-subtle)]">{metric.label}</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">{metric.detail}</p>
           </article>
         ))}
       </div>

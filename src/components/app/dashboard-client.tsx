@@ -40,25 +40,25 @@ export default function DashboardClient({
   return (
     <AppShell>
       <div className="space-y-6">
-        <header className="rounded-3xl border border-white/40 bg-white/70 p-6 backdrop-blur">
+        <header className="glass-panel p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-peat/60">Dashboard</p>
-              <h1 className="mt-2 text-3xl font-semibold text-peat">{display.name}</h1>
-              <p className="mt-1 text-sm text-peat/60">{display.handle}</p>
-              {display.bio ? <p className="mt-3 max-w-2xl text-sm text-peat/70">{display.bio}</p> : null}
+              <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Dashboard</p>
+              <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">{display.name}</h1>
+              <p className="mt-1 text-sm text-[var(--text-muted)]">{display.handle}</p>
+              {display.bio ? <p className="mt-3 max-w-2xl text-sm text-[var(--text-muted)]">{display.bio}</p> : null}
             </div>
 
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setOpenCreate(true)}
-                className="rounded-full bg-peat px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white"
+                className="rounded-full bg-[var(--accent)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white"
               >
                 Create
               </button>
               <button
                 onClick={signOut}
-                className="rounded-full border border-white/60 bg-white/50 px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-peat"
+                className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
               >
                 Logout
               </button>
@@ -68,26 +68,25 @@ export default function DashboardClient({
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             <button
               onClick={() => setOpenFollowers(true)}
-              className="rounded-2xl border border-white/50 bg-white/60 p-4 text-left"
+              className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left"
             >
-              <p className="text-3xl font-semibold text-peat">{stats.followers}</p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-peat/60">Followers</p>
+              <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.followers}</p>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--text-subtle)]">Followers</p>
             </button>
             <button
               onClick={() => setOpenFollowing(true)}
-              className="rounded-2xl border border-white/50 bg-white/60 p-4 text-left"
+              className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left"
             >
-              <p className="text-3xl font-semibold text-peat">{stats.following}</p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-peat/60">Following</p>
+              <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.following}</p>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--text-subtle)]">Following</p>
             </button>
-            <div className="rounded-2xl border border-white/50 bg-white/60 p-4">
-              <p className="text-3xl font-semibold text-peat">{stats.posts}</p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-peat/60">Posts</p>
+            <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4">
+              <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.posts}</p>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--text-subtle)]">Posts</p>
             </div>
           </div>
         </header>
 
-        {/* Keep existing "active users / stats" feature visible here */}
         <LiveStats
           postsCount={liveStats.totalPosts}
           commentsCount={liveStats.totalComments}
@@ -99,13 +98,13 @@ export default function DashboardClient({
 
         <Modal open={openFollowers} onClose={() => setOpenFollowers(false)} title="Followers">
           {followers.length === 0 ? (
-            <p className="text-sm text-peat/70">No followers yet.</p>
+            <p className="text-sm text-[var(--text-muted)]">No followers yet.</p>
           ) : (
             <ul className="space-y-2">
               {followers.map((p) => (
-                <li key={p.user_id} className="rounded-2xl border border-peat/10 bg-white/70 p-3">
-                  <p className="font-semibold text-peat">{p.display_name}</p>
-                  <p className="text-sm text-peat/60">@{p.handle}</p>
+                <li key={p.user_id} className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-3">
+                  <p className="font-semibold text-[var(--text-primary)]">{p.display_name}</p>
+                  <p className="text-sm text-[var(--text-muted)]">@{p.handle}</p>
                 </li>
               ))}
             </ul>
@@ -114,13 +113,13 @@ export default function DashboardClient({
 
         <Modal open={openFollowing} onClose={() => setOpenFollowing(false)} title="Following">
           {following.length === 0 ? (
-            <p className="text-sm text-peat/70">Not following anyone yet.</p>
+            <p className="text-sm text-[var(--text-muted)]">Not following anyone yet.</p>
           ) : (
             <ul className="space-y-2">
               {following.map((p) => (
-                <li key={p.user_id} className="rounded-2xl border border-peat/10 bg-white/70 p-3">
-                  <p className="font-semibold text-peat">{p.display_name}</p>
-                  <p className="text-sm text-peat/60">@{p.handle}</p>
+                <li key={p.user_id} className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-3">
+                  <p className="font-semibold text-[var(--text-primary)]">{p.display_name}</p>
+                  <p className="text-sm text-[var(--text-muted)]">@{p.handle}</p>
                 </li>
               ))}
             </ul>
@@ -128,7 +127,6 @@ export default function DashboardClient({
         </Modal>
 
         <Modal open={openCreate} onClose={() => setOpenCreate(false)} title="Create a post">
-          {/* Reuse existing creator for speed */}
           <PostCreator categories={categories} tags={tags} />
         </Modal>
       </div>

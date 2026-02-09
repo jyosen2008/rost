@@ -1,16 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import AppShell from '@/components/app/app-shell'
-import SearchFilter from '@/components/search-filter'
-import TagPills from '@/components/tag-pills'
 import PostCard from '@/components/post-card'
+import TagPills from '@/components/tag-pills'
 import { useBookmarks } from '@/hooks/use-bookmarks'
 import { usePostInteractions } from '@/hooks/use-post-interactions'
 import { useSession } from '@/hooks/use-session'
 import { supabaseClient } from '@/lib/supabase-client'
-import type { LiveStatsSummary, Post } from '@/lib/db'
-import LiveStats from '@/components/live-stats'
+import type { Post } from '@/lib/db'
 
 const extraMoodTags = [
   'Archive',
@@ -20,7 +18,14 @@ const extraMoodTags = [
   'Science',
   'Letters',
   'Night',
-  'Stillness'
+  'Stillness',
+  'Dreams',
+  'Soundscape',
+  'Quietude',
+  'Memoir',
+  'Travel',
+  'Memory',
+  'Skyline'
 ]
 
 type ProfileLite = {
@@ -30,32 +35,58 @@ type ProfileLite = {
 }
 
 export default function HomeFeedClient({
-  posts,
+  posts: initialPosts,
   categories,
-  tags,
-  liveStats
+  tags
 }: {
   posts: Post[]
   categories: string[]
   tags: string[]
-  liveStats: LiveStatsSummary
 }) {
   const { user } = useSession()
-  const { bookmarks, toggleBookmark } = useBookmarks()
+  const [livePosts, setLivePosts] = useState<Post[]>(initialPosts)
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-
-  const moodTags = useMemo(() => Array.from(new Set([...extraMoodTags, ...tags])), [tags])
-
-  const postIds = useMemo(() => posts.map((p) => p.id), [posts])
-  const interactions = usePostInteractions(postIds)
-
   const [followingIds, setFollowingIds] = useState<string[]>([])
-
-  // Account search
   const [accountQuery, setAccountQuery] = useState('')
   const [accounts, setAccounts] = useState<ProfileLite[]>([])
+  const [searchActive, setSearchActive] = useState(false)
+  const searchWrapperRef = useRef<HTMLDivElement>(null)
+
+  const { bookmarks, toggleBookmark } = useBookmarks()
+  const postIds = useMemo(() => livePosts.map((p) => p.id), [livePosts])
+  const interactions = usePostInteractions(postIds)
+  const moodTags = useMemo(() => Array.from(new Set([...extraMoodTags, ...tags])), [tags])
+
+  const fetchPosts = useCallback(async () => {
+    const { data, error } = await supabaseClient
+      .from('posts')
+      .select('id, title, slug, excerpt, cover_url, category, tags, content, published_at, created_at, author_name, author_id')
+      .order('published_at', { ascending: false })
+      .limit(30)
+
+    if (error) {
+      console.error('Live posts fetch failed', error)
+      return
+    }
+
+    setLivePosts((data ?? []) as Post[])
+  }, [])
+
+  useEffect(() => {
+    fetchPosts()
+    const channel = supabaseClient
+      .channel('home-feed-posts')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+        fetchPosts()
+      })
+      .subscribe()
+
+    return () => {
+      supabaseClient.removeChannel(channel)
+    }
+  }, [fetchPosts])
 
   useEffect(() => {
     const loadFollowing = async () => {
@@ -73,11 +104,21 @@ export default function HomeFeedClient({
         setFollowingIds([])
         return
       }
-      setFollowingIds((data ?? []).map((r) => r.following_id as string))
+      setFollowingIds((data ?? []).map((row) => row.following_id as string))
     }
 
     loadFollowing()
   }, [user?.id])
+
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      if (!searchWrapperRef.current?.contains(event.target as Node)) {
+        setSearchActive(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   useEffect(() => {
     const q = accountQuery.trim().replace(/^@/, '')
@@ -110,12 +151,14 @@ export default function HomeFeedClient({
   }, [accountQuery])
 
   const filteredPosts = useMemo(() => {
-    const base = posts.filter((post) => {
+    const base = livePosts.filter((post) => {
       const lowerTitle = post.title.toLowerCase()
       const lowerExcerpt = (post.excerpt ?? '').toLowerCase()
-      const s = search.trim().toLowerCase()
+      const normalizedSearch = search.trim().toLowerCase()
       const searchMatch =
-        s === '' || lowerTitle.includes(s) || lowerExcerpt.includes(s)
+        normalizedSearch === '' ||
+        lowerTitle.includes(normalizedSearch) ||
+        lowerExcerpt.includes(normalizedSearch)
       if (!searchMatch) return false
       if (selectedCategory && post.category !== selectedCategory) return false
       if (selectedTags.length > 0) {
@@ -125,90 +168,130 @@ export default function HomeFeedClient({
       return true
     })
 
-    // Personalize: prioritize followed authors first
     const followingSet = new Set(followingIds)
     return [...base].sort((a, b) => {
       const aFollowed = a.author_id && followingSet.has(a.author_id) ? 1 : 0
       const bFollowed = b.author_id && followingSet.has(b.author_id) ? 1 : 0
       if (aFollowed !== bFollowed) return bFollowed - aFollowed
-      const ad = new Date(a.published_at ?? a.created_at).getTime()
-      const bd = new Date(b.published_at ?? b.created_at).getTime()
-      return bd - ad
+      const aDate = new Date(a.published_at ?? a.created_at).getTime()
+      const bDate = new Date(b.published_at ?? b.created_at).getTime()
+      return bDate - aDate
     })
-  }, [posts, search, selectedCategory, selectedTags, followingIds])
+  }, [livePosts, search, selectedCategory, selectedTags, followingIds])
 
   const toggleMoodTag = (tag: string) => {
-    setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]))
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((current) => current !== tag) : [...prev, tag]
+    )
+  }
+
+  const clearFilters = () => {
+    setSearch('')
+    setSelectedCategory(null)
+    setSelectedTags([])
+    setAccountQuery('')
+    setAccounts([])
   }
 
   return (
     <AppShell>
       <div className="space-y-6">
-        <header className="rounded-3xl border border-white/40 bg-white/70 p-5 backdrop-blur">
+        <header className="glass-panel p-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-peat/60">Home</p>
-              <h1 className="mt-1 text-2xl font-semibold text-peat">Your feed</h1>
-              <p className="mt-1 text-sm text-peat/60">Recent blogs, prioritized by who you follow and what you read.</p>
+              <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Home</p>
+              <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Your feed</h1>
+              <p className="mt-1 text-sm text-[var(--text-muted)]">Fresh posts curated from people you follow and topics you love.</p>
             </div>
-            <div className="w-full max-w-xl">
+            <div ref={searchWrapperRef} className="relative w-full max-w-xl">
               <input
-                value={accountQuery}
-                onChange={(e) => setAccountQuery(e.target.value)}
-                placeholder="Search accounts (e.g. @jyotishko)"
-                className="w-full rounded-2xl border border-white/60 bg-white/60 px-4 py-3 text-sm text-peat placeholder:text-peat/50 focus:outline-none"
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => setSearchActive(true)}
+                placeholder="Search posts, tags, or people"
+                className="w-full rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)] focus:outline-none"
               />
-              {accounts.length > 0 ? (
-                <div className="mt-2 rounded-2xl border border-white/60 bg-white/80 p-2">
-                  {accounts.map((a) => (
-                    <a
-                      key={a.user_id}
-                      href={`/profile`}
-                      className="block rounded-xl px-3 py-2 text-sm text-peat/80 hover:bg-white"
+              {searchActive && (
+                <div className="absolute left-0 right-0 top-full z-10 mt-3 space-y-3 rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-4 shadow-lg shadow-black/20">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Categories</label>
+                    <select
+                      value={selectedCategory ?? ''}
+                      onChange={(event) => setSelectedCategory(event.target.value || null)}
+                      className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-2 text-xs text-[var(--text-primary)]"
                     >
-                      <span className="font-semibold">{a.display_name}</span> <span className="text-peat/50">@{a.handle}</span>
-                    </a>
-                  ))}
+                      <option value="">All categories</option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Find an account</label>
+                    <input
+                      type="search"
+                      value={accountQuery}
+                      onChange={(event) => setAccountQuery(event.target.value)}
+                      placeholder="Search handles or display names"
+                      className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-subtle)]"
+                    />
+                    {accounts.length > 0 && (
+                      <div className="space-y-2">
+                        {accounts.map((account) => (
+                          <div
+                            key={account.user_id}
+                            className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-2 text-sm text-[var(--text-muted)]"
+                          >
+                            <p className="font-semibold text-[var(--text-primary)]">{account.display_name}</p>
+                            <p className="text-xs text-[var(--text-subtle)]">@{account.handle}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[0.65rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Mood filters</p>
+                      <button
+                        type="button"
+                        onClick={clearFilters}
+                        className="text-[0.55rem] font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                    <TagPills
+                      tags={moodTags}
+                      selectedTags={selectedTags}
+                      onTagToggle={toggleMoodTag}
+                      onClear={() => setSelectedTags([])}
+                    />
+                  </div>
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr,380px]">
-          <div className="space-y-4">
-            <SearchFilter categories={categories} onSearch={setSearch} onCategoryChange={setSelectedCategory} />
-            <TagPills tags={moodTags} selectedTags={selectedTags} onTagToggle={toggleMoodTag} onClear={() => setSelectedTags([])} />
-
-            <div className="grid gap-6">
-              {filteredPosts.length === 0 ? (
-                <p className="text-peat/60">No posts match your filters yet.</p>
-              ) : (
-                filteredPosts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    isBookmarked={bookmarks.includes(post.id)}
-                    onBookmarkToggle={() => toggleBookmark(post.id)}
-                    likeCount={interactions.likeCounts[post.id] ?? 0}
-                    liked={interactions.likedPosts.includes(post.id)}
-                    onToggleLike={() => interactions.toggleLike(post.id)}
-                  />
-                ))
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <LiveStats
-              postsCount={liveStats.totalPosts}
-              commentsCount={liveStats.totalComments}
-              bookmarksCount={liveStats.totalBookmarks}
-              categoriesCount={categories.length}
-              tagsCount={tags.length}
-              authorsCount={liveStats.authorsCount}
-            />
-          </div>
+        <div className="grid gap-6">
+          {filteredPosts.length === 0 ? (
+            <p className="text-[var(--text-muted)]">No posts match your filters yet.</p>
+          ) : (
+            filteredPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                isBookmarked={bookmarks.includes(post.id)}
+                onBookmarkToggle={() => toggleBookmark(post.id)}
+                likeCount={interactions.likeCounts[post.id] ?? 0}
+                liked={interactions.likedPosts.includes(post.id)}
+                onToggleLike={() => interactions.toggleLike(post.id)}
+              />
+            ))
+          )}
         </div>
       </div>
     </AppShell>

@@ -93,6 +93,20 @@ export function useProfileStats(userId: string | null) {
     load()
   }, [load])
 
+  useEffect(() => {
+    if (!userId) return
+    const channel = supabaseClient
+      .channel(`profile-stats-${userId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'follows', filter: `following_id=eq.${userId}` }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'follows', filter: `follower_id=eq.${userId}` }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts', filter: `author_id=eq.${userId}` }, () => load())
+      .subscribe()
+
+    return () => {
+      supabaseClient.removeChannel(channel)
+    }
+  }, [load, userId])
+
   return useMemo(
     () => ({ profile, stats, followers, following, loading, refresh: load }),
     [profile, stats, followers, following, loading, load]

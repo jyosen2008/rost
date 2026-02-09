@@ -21,15 +21,15 @@ export default function Modal({ open, onClose, title, children }: { open: boolea
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/40 bg-white/90 shadow-2xl shadow-peat/20 dark:bg-peat/90">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl glass-panel">
         {title ? (
-          <div className="flex items-center justify-between border-b border-peat/10 px-5 py-4">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-peat/70 dark:text-white">
+          <div className="flex items-center justify-between border-b border-[var(--panel-border)] px-5 py-4">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]">
               {title}
             </h3>
             <button
               onClick={onClose}
-              className="rounded-full border border-peat/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-peat/70 dark:text-white"
+              className="rounded-full border border-[var(--card-border)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
             >
               Close
             </button>

@@ -16,9 +16,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
   }, [loading, user, router])
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[260px,1fr]">
+    <div className="grid gap-6 lg:grid-cols-[72px,1fr]">
       <Sidebar />
-      <div className="min-w-0">{children}</div>
+      <div className="min-w-0 space-y-6">{children}</div>
     </div>
   )
 }

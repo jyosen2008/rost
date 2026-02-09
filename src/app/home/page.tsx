@@ -1,15 +1,14 @@
 import dynamic from 'next/dynamic'
-import { getCategories, getLiveStats, getPublishedPosts, getTags } from '@/lib/db'
+import { getCategories, getPublishedPosts, getTags } from '@/lib/db'
 
 const HomeFeedClient = dynamic(() => import('@/components/app/home-feed-client'), { ssr: false })
 
 export default async function HomePage() {
-  const [posts, categories, tags, liveStats] = await Promise.all([
+  const [posts, categories, tags] = await Promise.all([
     getPublishedPosts(),
     getCategories(),
-    getTags(),
-    getLiveStats()
+    getTags()
   ])
 
-  return <HomeFeedClient posts={posts} categories={categories} tags={tags} liveStats={liveStats} />
+  return <HomeFeedClient posts={posts} categories={categories} tags={tags} />
 }

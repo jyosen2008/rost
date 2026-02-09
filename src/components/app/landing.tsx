@@ -21,23 +21,23 @@ export default function Landing() {
   }, [loading, user, router])
 
   return (
-    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden rounded-3xl border border-white/40 bg-white/40 p-6 shadow-2xl shadow-peat/10">
+    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-6 shadow-2xl shadow-black/30">
       <WateryBackground />
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr,0.85fr]">
         <div className="space-y-5">
-          <p className="text-xs uppercase tracking-[0.5em] text-peat/60">Rost</p>
-          <h1 className="text-4xl font-semibold leading-tight text-peat sm:text-6xl">
+          <p className="text-xs uppercase tracking-[0.5em] text-[var(--text-muted)]">Rost</p>
+          <h1 className="text-4xl font-semibold leading-tight text-[var(--text-primary)] sm:text-6xl">
             Reflections, opinions, stories, thoughts.
           </h1>
-          <p className="max-w-xl text-lg text-peat/70">
+          <p className="max-w-xl text-lg text-[var(--text-muted)]">
             A calm place to write, follow people you like, and keep a personal feed of what you actually want to read.
           </p>
           <div className="flex flex-wrap gap-3">
             <ThemeToggle />
             <a
               href="#auth"
-              className="rounded-full border border-white/50 bg-white/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-peat backdrop-blur hover:border-peat/40"
+              className="rounded-full border border-[var(--card-border)] bg-[var(--icon-bg)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-primary)]"
             >
               Login / Sign up
             </a>
@@ -46,13 +46,13 @@ export default function Landing() {
 
         <div id="auth" className="flex w-full justify-center">
           {/* Avoid layout jump while hydrating */}
-          {mounted ? <AuthPanel /> : <div className="h-[340px] w-[360px] rounded-3xl bg-white/40" />}
+          {mounted ? <AuthPanel /> : <div className="h-[340px] w-[360px] rounded-3xl bg-[var(--panel-bg)]" />}
         </div>
       </div>
 
-      <div className="relative mx-auto mt-10 max-w-6xl rounded-3xl border border-white/40 bg-white/50 p-5 text-sm text-peat/70 backdrop-blur">
-        <p className="text-xs uppercase tracking-[0.3em] text-peat/60">What you get after login</p>
-        <ul className="mt-3 list-disc space-y-1 pl-5">
+      <div className="relative mx-auto mt-10 max-w-6xl rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-5 text-sm text-[var(--text-muted)] shadow-sm shadow-black/10">
+        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">What you get after login</p>
+        <ul className="mt-3 list-disc space-y-1 pl-5 text-[var(--text-muted)]">
           <li>Profile dashboard with followers / following + post count</li>
           <li>Create post popup (no leaving the dashboard)</li>
           <li>Home feed prioritized by who you follow + what you read</li>
