@@ -100,6 +100,7 @@ export function useProfileStats(userId: string | null) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'follows', filter: `following_id=eq.${userId}` }, () => load())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'follows', filter: `follower_id=eq.${userId}` }, () => load())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'posts', filter: `author_id=eq.${userId}` }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `user_id=eq.${userId}` }, () => load())
       .subscribe()
 
     return () => {

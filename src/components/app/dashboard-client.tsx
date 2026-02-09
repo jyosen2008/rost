@@ -22,7 +22,7 @@ export default function DashboardClient({
 }) {
   const router = useRouter()
   const { user } = useSession()
-  const { profile, stats, followers, following } = useProfileStats(user?.id ?? null)
+  const { profile, stats, followers, following, refresh: refreshProfile } = useProfileStats(user?.id ?? null)
   const [openFollowers, setOpenFollowers] = useState(false)
   const [openFollowing, setOpenFollowing] = useState(false)
   const [openCreate, setOpenCreate] = useState(false)
@@ -121,12 +121,17 @@ export default function DashboardClient({
     if (!user?.id) return
     setSavingProfile(true)
     const normalizedHandle = handleInput.trim().replace(/^@/, '')
+    if (!normalizedHandle) {
+      setActionMessage('Handle cannot be empty.')
+      setSavingProfile(false)
+      return
+    }
     const updates = {
       user_id: user.id,
-      handle: normalizedHandle || undefined,
+      handle: normalizedHandle,
       bio: bioInput.trim() || undefined
     }
-    const { error } = await supabaseClient.from('profiles').upsert(updates)
+    const { error } = await supabaseClient.from('profiles').upsert(updates, { onConflict: 'user_id' })
     setSavingProfile(false)
     if (error) {
       console.error('Profile update failed', error)
@@ -135,7 +140,7 @@ export default function DashboardClient({
     }
     setActionMessage('Profile updated!')
     setEditingProfile(false)
-    router.refresh()
+    refreshProfile()
   }
 
   const signOut = async () => {
