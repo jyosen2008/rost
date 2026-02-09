@@ -12,6 +12,8 @@ export type Post = {
   published_at: string | null
   created_at: string
   author_name: string | null
+  // NOTE: some deployments may not have this column yet; treat as optional.
+  author_id?: string | null
 }
 
 export async function getPublishedPosts({
@@ -99,13 +101,15 @@ export type LiveStatsSummary = {
   totalPosts: number
   totalComments: number
   totalBookmarks: number
+  authorsCount: number
 }
 
 export async function getLiveStats(): Promise<LiveStatsSummary> {
-  const [postsResult, commentsResult, bookmarksResult] = await Promise.all([
+  const [postsResult, commentsResult, bookmarksResult, profilesResult] = await Promise.all([
     supabaseServer.from('posts').select('id', { head: true, count: 'exact' }),
     supabaseServer.from('comments').select('id', { head: true, count: 'exact' }),
-    supabaseServer.from('bookmarks').select('id', { head: true, count: 'exact' })
+    supabaseServer.from('bookmarks').select('id', { head: true, count: 'exact' }),
+    supabaseServer.from('profiles').select('user_id', { head: true, count: 'exact' })
   ])
 
   if (postsResult.error) {
@@ -117,10 +121,14 @@ export async function getLiveStats(): Promise<LiveStatsSummary> {
   if (bookmarksResult.error) {
     console.error('Live stats bookmarks count failed', bookmarksResult.error)
   }
+  if (profilesResult.error) {
+    console.error('Live stats authors count failed', profilesResult.error)
+  }
 
   return {
     totalPosts: postsResult.count ?? 0,
     totalComments: commentsResult.count ?? 0,
-    totalBookmarks: bookmarksResult.count ?? 0
+    totalBookmarks: bookmarksResult.count ?? 0,
+    authorsCount: profilesResult.count ?? 0
   }
 }

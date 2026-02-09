@@ -1,17 +1,11 @@
-import dynamic from 'next/dynamic'
-import { getCategories, getLiveStats, getPublishedPosts, getTags } from '@/lib/db'
+'use client'
 
-const HomeClient = dynamic(() => import('@/components/home-client'), {
+import dynamic from 'next/dynamic'
+
+const Landing = dynamic(() => import('@/components/app/landing'), {
   ssr: false
 })
 
-export default async function HomePage() {
-  const [posts, categories, tags, liveStats] = await Promise.all([
-    getPublishedPosts(),
-    getCategories(),
-    getTags(),
-    getLiveStats()
-  ])
-
-  return <HomeClient posts={posts} categories={categories} tags={tags} liveStats={liveStats} />
+export default function Page() {
+  return <Landing />
 }
