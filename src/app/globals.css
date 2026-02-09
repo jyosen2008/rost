@@ -3,38 +3,20 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  --rast-bg: #e3f4ff;
-  --rast-text: #0b1c33;
-  --rast-panel: rgba(255, 255, 255, 0.96);
-  --rast-border: rgba(68, 129, 220, 0.25);
-  --panel-bg: rgba(255, 255, 255, 0.9);
-  --panel-border: rgba(90, 146, 214, 0.35);
-  --card-border: rgba(76, 143, 217, 0.25);
-  --text-primary: #0b1c33;
-  --text-muted: rgba(11, 28, 51, 0.65);
-  --text-subtle: rgba(11, 28, 51, 0.45);
-  --accent: #4f8df5;
-  --accent-soft: rgba(79, 141, 245, 0.2);
-  --icon-bg: rgba(255, 255, 255, 0.85);
-  --home-bg: #eef6ff;
-}
-
-:root[data-theme='dark'] {
   color-scheme: dark;
   --rast-bg: #030b16;
-  --rast-text: #f4fbff;
+  --rast-text: #f8fbff;
   --rast-panel: rgba(5, 15, 28, 0.96);
-  --rast-border: rgba(255, 255, 255, 0.15);
-  --panel-bg: rgba(9, 20, 34, 0.92);
+  --rast-border: rgba(255, 255, 255, 0.2);
+  --panel-bg: rgba(6, 16, 31, 0.92);
   --panel-border: rgba(255, 255, 255, 0.18);
-  --card-border: rgba(255, 255, 255, 0.18);
+  --card-border: rgba(255, 255, 255, 0.22);
   --text-primary: #f4fbff;
-  --text-muted: rgba(244, 251, 255, 0.74);
+  --text-muted: rgba(244, 251, 255, 0.75);
   --text-subtle: rgba(244, 251, 255, 0.5);
   --accent: #93cfff;
   --accent-soft: rgba(147, 207, 255, 0.2);
-  --icon-bg: rgba(255, 255, 255, 0.05);
+  --icon-bg: rgba(255, 255, 255, 0.08);
   --home-bg: #010913;
 }
 

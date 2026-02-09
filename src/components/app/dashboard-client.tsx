@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import AppShell from '@/components/app/app-shell'
 import Modal from '@/components/app/modal'
 import PostCreator from '@/components/post-creator'
@@ -19,6 +20,7 @@ export default function DashboardClient({
   tags: string[]
   liveStats: { totalPosts: number; totalComments: number; totalBookmarks: number; authorsCount: number }
 }) {
+  const router = useRouter()
   const { user } = useSession()
   const { profile, stats, followers, following } = useProfileStats(user?.id ?? null)
   const [openFollowers, setOpenFollowers] = useState(false)
@@ -27,11 +29,17 @@ export default function DashboardClient({
   const [myPosts, setMyPosts] = useState<Post[]>([])
   const [loadingPosts, setLoadingPosts] = useState(false)
   const [actionMessage, setActionMessage] = useState<string | null>(null)
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [handleInput, setHandleInput] = useState('')
+  const [bioInput, setBioInput] = useState('')
+  const [savingProfile, setSavingProfile] = useState(false)
+
+  const profileId = profile?.user_id ?? user?.id
 
   const display = useMemo(() => {
     const handle = profile?.handle ? `@${profile.handle}` : '@rost'
     return {
-      name: profile?.display_name ?? 'Röst writer',
+      name: profile?.display_name ?? 'Röst-er',
       handle,
       bio: profile?.bio ?? ''
     }
@@ -76,7 +84,8 @@ export default function DashboardClient({
 
   const copyProfileLink = () => {
     if (typeof window === 'undefined') return
-    const url = `${window.location.origin}/profiles/${display.handle.replace('@', '')}`
+    const handleKey = profile?.handle ? profile.handle : 'rost'
+    const url = `${window.location.origin}/profiles/${handleKey}`
     navigator.clipboard.writeText(url)
     setActionMessage('Profile link copied to clipboard.')
   }
@@ -102,6 +111,33 @@ export default function DashboardClient({
     setActionMessage('Post deleted.')
   }
 
+  const handleEditToggle = () => {
+    setEditingProfile((prev) => !prev)
+    setHandleInput(profile?.handle ?? '')
+    setBioInput(profile?.bio ?? '')
+  }
+
+  const saveProfileEdits = async () => {
+    if (!user?.id) return
+    setSavingProfile(true)
+    const normalizedHandle = handleInput.trim().replace(/^@/, '')
+    const updates = {
+      user_id: user.id,
+      handle: normalizedHandle || undefined,
+      bio: bioInput.trim() || undefined
+    }
+    const { error } = await supabaseClient.from('profiles').upsert(updates)
+    setSavingProfile(false)
+    if (error) {
+      console.error('Profile update failed', error)
+      setActionMessage('Unable to save profile. Try again.')
+      return
+    }
+    setActionMessage('Profile updated!')
+    setEditingProfile(false)
+    router.refresh()
+  }
+
   const signOut = async () => {
     await supabaseClient.auth.signOut()
   }
@@ -114,14 +150,15 @@ export default function DashboardClient({
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Dashboard</p>
               <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">{display.name}</h1>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">{display.handle}</p>
+              <p className="text-sm text-[var(--text-muted)]">{display.handle}</p>
+              <p className="text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">ID: {profileId ?? '—'}</p>
               {display.bio ? <p className="mt-3 max-w-2xl text-sm text-[var(--text-muted)]">{display.bio}</p> : null}
             </div>
 
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setOpenCreate(true)}
-                className="rounded-full bg-[var(--accent)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white"
+                className="rounded-full bg-[var(--accent)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-black"
               >
                 Create
               </button>
@@ -157,22 +194,46 @@ export default function DashboardClient({
         </header>
 
         <section className="glass-panel p-6 space-y-4">
-          <div className="flex flex-col gap-1 text-sm text-[var(--text-muted)]">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-subtle)]">Profile details</p>
-            <p className="text-[var(--text-primary)]">Email: {user?.email ?? "Private"}</p>
-            <p className="text-[var(--text-primary)]">Handle: {display.handle}</p>
-            <p className="text-[var(--text-primary)]">Bio: {display.bio || "No bio yet"}</p>
-          </div>
           <div className="flex items-center justify-between">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-subtle)]">Share link</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-subtle)]">Profile details</p>
             <button
               type="button"
-              onClick={copyProfileLink}
+              onClick={handleEditToggle}
               className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
             >
-              Copy profile link
+              {editingProfile ? 'Cancel' : 'Edit profile'}
             </button>
           </div>
+          <div className="text-[var(--text-primary)] space-y-1">
+            <p className="text-sm">Handle: {display.handle}</p>
+            <p className="text-sm">Bio: {display.bio || 'No bio yet'}</p>
+          </div>
+          {editingProfile && (
+            <div className="space-y-3">
+              <p className="text-[0.65rem] uppercase tracking-[0.3em] text-[var(--text-subtle)]">Update your profile</p>
+              <input
+                value={handleInput}
+                onChange={(event) => setHandleInput(event.target.value)}
+                placeholder="Handle"
+                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)]"
+              />
+              <textarea
+                value={bioInput}
+                onChange={(event) => setBioInput(event.target.value)}
+                rows={3}
+                placeholder="Short bio"
+                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)]"
+              />
+              <button
+                type="button"
+                onClick={saveProfileEdits}
+                disabled={savingProfile}
+                className="w-full rounded-3xl bg-[var(--accent)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black"
+              >
+                {savingProfile ? 'Saving…' : 'Save profile'}
+              </button>
+            </div>
+          )}
           {actionMessage ? <p className="text-xs text-[var(--text-muted)]">{actionMessage}</p> : null}
         </section>
 

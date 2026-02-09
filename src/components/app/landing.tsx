@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import AuthPanel from '@/components/auth-panel'
-import ThemeToggle from '@/components/theme-toggle'
 import WateryBackground from '@/components/app/watery-background'
 import { useSession } from '@/hooks/use-session'
 import { useRouter } from 'next/navigation'
@@ -34,7 +33,6 @@ export default function Landing() {
             A pastel-blue sanctuary for writing, sharing, and following the voices you care about.
           </p>
           <div className="flex flex-wrap gap-3">
-            <ThemeToggle />
             <a
               href="#auth"
               className="rounded-full border border-[var(--card-border)] bg-[var(--icon-bg)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-primary)]"
