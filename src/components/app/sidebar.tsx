@@ -72,8 +72,8 @@ export default function Sidebar() {
           </Link>
         )
       })}
-      <div className="mt-3 flex w-full items-center justify-center">
-        <ThemeToggle />
+      <div className="mt-2 flex w-full items-center justify-center rounded-2xl">
+        <ThemeToggle compact />
       </div>
     </aside>
   )

@@ -122,13 +122,13 @@ export default function DashboardClient({
   const saveProfileEdits = async () => {
     if (!user?.id) return
     setSavingProfile(true)
-    const normalizedHandle = handleInput.trim().replace(/^@/, '')
+    const normalizedHandle = handleInput.trim().replace(/^@/, '').toLowerCase()
     if (!normalizedHandle) {
       setActionMessage('Handle cannot be empty.')
       setSavingProfile(false)
       return
     }
-    const normalizedDisplayName = displayNameInput.trim() || 'Röst-er'
+    const normalizedDisplayName = displayNameInput.trim() || profile?.display_name || 'Röst-er'
     const updates = {
       user_id: user.id,
       handle: normalizedHandle,
@@ -139,7 +139,7 @@ export default function DashboardClient({
     setSavingProfile(false)
     if (error) {
       console.error('Profile update failed', error)
-      setActionMessage('Unable to save profile. Try again.')
+      setActionMessage(error.message || 'Unable to save profile. Try again.')
       return
     }
     setActionMessage('Profile updated!')
@@ -224,6 +224,12 @@ export default function DashboardClient({
                 value={handleInput}
                 onChange={(event) => setHandleInput(event.target.value)}
                 placeholder="Handle"
+                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)]"
+              />
+              <input
+                value={displayNameInput}
+                onChange={(event) => setDisplayNameInput(event.target.value)}
+                placeholder="Display name"
                 className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)]"
               />
               <textarea
