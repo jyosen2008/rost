@@ -33,7 +33,7 @@ const SEARCH_MODES = [
   { value: 'posts', label: 'Search for Rösts (Posts)' }
 ]
 
-const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim()
+const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim().toLowerCase()
 
 export default function SearchModal({ open, onClose }: SearchModalProps) {
   const [mode, setMode] = useState<SearchMode>('users')

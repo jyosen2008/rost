@@ -23,7 +23,7 @@ export default function PostCreator({ categories }: PostCreatorProps) {
   const [tagInput, setTagInput] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
 
-  const normalizeTag = (value: string) => value.replace(/^#+/, '').trim()
+  const normalizeTag = (value: string) => value.replace(/^#+/, '').trim().toLowerCase()
 
   const addTag = () => {
     const raw = normalizeTag(tagInput)

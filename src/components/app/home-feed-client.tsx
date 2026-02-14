@@ -9,7 +9,7 @@ import { useSession } from '@/hooks/use-session'
 import { supabaseClient } from '@/lib/supabase-client'
 import type { Post } from '@/lib/db'
 
-const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim()
+const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim().toLowerCase()
 
 export default function HomeFeedClient({
   posts: initialPosts,
