@@ -25,11 +25,6 @@ export default function Landing() {
       <WateryBackground />
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr,0.85fr]">
         <div className="space-y-5">
-          <div className="flex justify-center">
-            <div className="rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-2 shadow-lg shadow-black/30">
-              <ThemeToggle compact className="shadow-sm" />
-            </div>
-          </div>
           <p className="text-xs uppercase tracking-[0.5em] text-[var(--text-subtle)]">Röst</p>
           <h1 className="text-4xl font-semibold leading-tight text-[var(--text-primary)] sm:text-6xl">
             Reflections, opinions, stories, thoughts.
