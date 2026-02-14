@@ -9,6 +9,8 @@ import { useSession } from '@/hooks/use-session'
 import { supabaseClient } from '@/lib/supabase-client'
 import type { Post } from '@/lib/db'
 
+const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim()
+
 export default function HomeFeedClient({
   posts: initialPosts,
   categories,
@@ -32,12 +34,10 @@ export default function HomeFeedClient({
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([])
   const [hashtagInput, setHashtagInput] = useState('')
   const [followingIds, setFollowingIds] = useState<string[]>([])
-  const [followingIds, setFollowingIds] = useState<string[]>([])
 
   const { bookmarks, toggleBookmark } = useBookmarks()
   const postIds = useMemo(() => displayPosts.map((p) => p.id), [displayPosts])
   const interactions = usePostInteractions(postIds)
-  const moodTags = useMemo(() => Array.from(new Set([...extraMoodTags, ...tags])), [tags])
 
   const getTimestamp = (post: Post | null | undefined) => {
     if (!post) return null
@@ -131,17 +131,16 @@ export default function HomeFeedClient({
     loadFollowing()
   }, [user?.id, setFollowingIds])
 
-  const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim()
-
   const addHashtagFilter = () => {
-    const normalized = normalizeHashtag(hashtagInput)
-    if (!normalized) {
+    const tokens = hashtagInput
+      .split(/\s+/)
+      .map(normalizeHashtag)
+      .filter(Boolean)
+    if (!tokens.length) {
       setHashtagInput('')
       return
     }
-    if (!selectedHashtags.includes(normalized)) {
-      setSelectedHashtags((prev) => [...prev, normalized])
-    }
+    setSelectedHashtags((prev) => Array.from(new Set([...prev, ...tokens])))
     setHashtagInput('')
   }
 
@@ -164,7 +163,7 @@ export default function HomeFeedClient({
       if (selectedCategory && post.category !== selectedCategory) return false
       if (selectedHashtags.length > 0) {
         const postTags = (post.tags ?? []).map((tag) => tag.toLowerCase())
-        if (!selectedHashtags.every((tag) => postTags.includes(tag.toLowerCase()))) return false
+        if (!selectedHashtags.some((tag) => postTags.includes(tag.toLowerCase()))) return false
       }
       return true
     })
@@ -229,7 +228,7 @@ export default function HomeFeedClient({
           </div>
         )}
 
-        <section className="glass-panel p-5 space-y-5">
+        <section className="glass-panel p-5 space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-2">
               <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Category</p>
@@ -265,19 +264,19 @@ export default function HomeFeedClient({
                 Clear hashtags
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 value={hashtagInput}
                 onChange={(event) => setHashtagInput(event.target.value)}
-                placeholder="Type a hashtag (e.g. #reflection)"
-                className="flex-1 min-w-[180px] rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+                placeholder="Type hashtags (e.g. #reflection #night)"
+                className="flex-1 rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
               />
               <button
                 type="button"
                 onClick={addHashtagFilter}
                 className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
               >
-                Add hashtag
+                Add filter
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
