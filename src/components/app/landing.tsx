@@ -38,10 +38,12 @@ export default function Landing() {
             A pastel-blue sanctuary for writing, sharing, and following the voices you care about.
           </p>
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-[var(--text-muted)]">
-              <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
-              <span>Röst mark</span>
-            </div>
+            <button
+              type="button"
+              className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-2"
+            >
+              <ThemeToggle compact />
+            </button>
             <a
               href="#auth"
               className="rounded-full border border-[var(--card-border)] bg-[var(--icon-bg)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-primary)]"
