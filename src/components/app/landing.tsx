@@ -23,14 +23,13 @@ export default function Landing() {
   return (
     <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-6 shadow-2xl shadow-black/30">
       <WateryBackground />
-      <div className="absolute inset-x-6 top-4 z-20 flex justify-end">
-        <div className="rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-1 shadow-lg shadow-black/30">
-          <ThemeToggle compact className="shadow-sm" />
-        </div>
-      </div>
-
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr,0.85fr]">
         <div className="space-y-5">
+          <div className="flex justify-center">
+            <div className="rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-2 shadow-lg shadow-black/30">
+              <ThemeToggle compact className="shadow-sm" />
+            </div>
+          </div>
           <p className="text-xs uppercase tracking-[0.5em] text-[var(--text-subtle)]">Röst</p>
           <h1 className="text-4xl font-semibold leading-tight text-[var(--text-primary)] sm:text-6xl">
             Reflections, opinions, stories, thoughts.
