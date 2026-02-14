@@ -100,6 +100,10 @@ create policy "Allow own likes" on likes
   for insert with check (user_id = auth.uid())
   for delete using (user_id = auth.uid());
 
+drop policy if exists "Allow own post delete" on posts;
+create policy "Allow own post delete" on posts
+  for delete using (author_id = auth.uid());
+
 create policy "Allow follow/unfollow" on follows
   for insert with check (follower_id = auth.uid())
   for delete using (follower_id = auth.uid());
