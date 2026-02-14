@@ -20,12 +20,13 @@ export async function POST(request: NextRequest) {
     ? tags.split(',').map((tag) => tag.trim()).filter(Boolean)
     : []
 
+  const categoryKey = category?.trim() ? category : null
   const { data, error } = await supabaseServer.from('posts').insert({
     title,
     slug: slugify(title),
     content,
     excerpt,
-    category,
+    category: categoryKey,
     tags: tagArray,
     cover_url: coverUrl,
     published_at: new Date().toISOString(),
