@@ -4,6 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import ThemeToggle from '@/components/theme-toggle'
 
+type SidebarProps = {
+  onSearchClick: () => void
+}
+
 const nav = [
   { href: '/home', label: 'Home', icon: IconHome },
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard }
@@ -48,7 +52,7 @@ function IconDashboard({ className }: IconProps) {
   )
 }
 
-export default function Sidebar() {
+export default function Sidebar({ onSearchClick }: SidebarProps) {
   const pathname = usePathname()
 
   return (
@@ -72,6 +76,18 @@ export default function Sidebar() {
           </Link>
         )
       })}
+      <button
+        type="button"
+        onClick={onSearchClick}
+        className="group relative flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] text-[var(--text-muted)] transition hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
+        title="Search"
+      >
+        <span className="sr-only">Open search</span>
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M16 16l5 5" />
+        </svg>
+      </button>
       <div className="mt-2 flex w-full items-center justify-center rounded-2xl">
         <ThemeToggle compact />
       </div>
