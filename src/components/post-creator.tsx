@@ -1,29 +1,16 @@
 'use client'
 
 import ImageUploader from './image-uploader'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useSession } from '@/hooks/use-session'
 import { useProfileStats } from '@/hooks/use-profile-stats'
 
 type PostCreatorProps = {
   categories: string[]
-  tags: string[]
+  tags?: string[]
 }
 
-const moodOptions = [
-  'Dreams',
-  'Stillness',
-  'Wander',
-  'Letters',
-  'Reflection',
-  'Art',
-  'Night',
-  'Breeze',
-  'Memory',
-  'Quietude'
-]
-
-export default function PostCreator({ categories, tags }: PostCreatorProps) {
+export default function PostCreator({ categories }: PostCreatorProps) {
   const { user } = useSession()
   const { profile } = useProfileStats(user?.id ?? null)
   const [title, setTitle] = useState('')
@@ -35,24 +22,15 @@ export default function PostCreator({ categories, tags }: PostCreatorProps) {
   const [loading, setLoading] = useState(false)
   const [tagInput, setTagInput] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [selectedMoodTags, setSelectedMoodTags] = useState<string[]>([])
+
+  const normalizeTag = (value: string) => value.replace(/^#+/, '').trim()
 
   const addTag = () => {
-    const tag = tagInput.trim()
-    if (tag && !selectedTags.includes(tag)) {
-      setSelectedTags((prev) => [...prev, tag])
+    const raw = normalizeTag(tagInput)
+    if (raw && !selectedTags.includes(raw)) {
+      setSelectedTags((prev) => [...prev, raw])
     }
     setTagInput('')
-  }
-
-  const toggleMoodTag = (tag: string) => {
-    if (selectedMoodTags.includes(tag)) {
-      setSelectedMoodTags((prev) => prev.filter((current) => current !== tag))
-      setSelectedTags((prev) => prev.filter((current) => current !== tag))
-      return
-    }
-    setSelectedMoodTags((prev) => [...prev, tag])
-    setSelectedTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -64,7 +42,7 @@ export default function PostCreator({ categories, tags }: PostCreatorProps) {
     setLoading(true)
     setStatus(null)
     try {
-      const combinedTags = Array.from(new Set([...selectedTags, ...selectedMoodTags]))
+      const combinedTags = Array.from(new Set(selectedTags))
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {
@@ -91,7 +69,6 @@ export default function PostCreator({ categories, tags }: PostCreatorProps) {
       setContent('')
       setCategory('')
       setSelectedTags([])
-      setSelectedMoodTags([])
       setCoverUrl('')
       setTagInput('')
     } catch (error) {
@@ -100,8 +77,6 @@ export default function PostCreator({ categories, tags }: PostCreatorProps) {
       setLoading(false)
     }
   }
-
-  const moodTagPills = useMemo(() => selectedMoodTags, [selectedMoodTags])
 
   return (
     <section className="glass-panel p-6">
@@ -143,48 +118,32 @@ export default function PostCreator({ categories, tags }: PostCreatorProps) {
               </option>
             ))}
           </select>
-          <div className="flex flex-1 items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-2">
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Hashtags</p>
+          <div className="flex flex-wrap items-center gap-2">
             <input
               value={tagInput}
               onChange={(event) => setTagInput(event.target.value)}
-              placeholder="Add tag"
-              className="flex-1 border-none bg-transparent p-0 text-sm text-[var(--text-muted)] focus:outline-none"
+              placeholder="Add a hashtag (e.g. #reflection)"
+              className="flex-1 min-w-[180px] rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
             />
             <button
               type="button"
               onClick={addTag}
-              className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
+              className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
             >
-              Add
+              Add hashtag
             </button>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {moodOptions.map((tag) => {
-            const active = selectedMoodTags.includes(tag)
-            return (
-              <button
-                key={`mood-${tag}`}
-                type="button"
-                onClick={() => toggleMoodTag(tag)}
-                className={`rounded-full border px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] transition ${
-                  active
-                    ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
-                    : 'border-[var(--card-border)] bg-[var(--panel-bg)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                {tag}
-              </button>
-            )
-          })}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {moodTagPills.map((tag) => (
+          {selectedTags.map((tag) => (
             <span
               key={`selected-${tag}`}
-              className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--accent)]"
+              className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
             >
-              {tag}
+              #{tag}
             </span>
           ))}
         </div>
