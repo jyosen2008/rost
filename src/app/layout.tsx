@@ -24,12 +24,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={clsx(playfair.variable, inter.variable)}>
-      <body className="min-h-screen bg-rost text-peat transition-colors duration-300">
+      <body className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)]">
         <ThemeProvider>
-          <div className="relative isolate overflow-hidden px-4 py-8 sm:px-8 lg:px-12">
-            <div className="pointer-events-none absolute inset-0 opacity-30 blur-3xl" />
+          <div className="relative min-h-screen overflow-hidden px-4 py-8 sm:px-8 lg:px-12">
             <div className="relative mx-auto max-w-6xl">
-              <div className="rounded-3xl border border-white/30 bg-gradient-to-b from-dawn/70 via-rost/80 to-mist/90 p-6 shadow-2xl shadow-peat/5">
+              <div className="relative rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-surface)] p-6 shadow-lg shadow-[rgba(8,16,32,0.3)]">
                 {children}
               </div>
             </div>

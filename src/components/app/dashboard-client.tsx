@@ -31,6 +31,7 @@ export default function DashboardClient({
   const [actionMessage, setActionMessage] = useState<string | null>(null)
   const [editingProfile, setEditingProfile] = useState(false)
   const [handleInput, setHandleInput] = useState('')
+  const [displayNameInput, setDisplayNameInput] = useState('')
   const [bioInput, setBioInput] = useState('')
   const [savingProfile, setSavingProfile] = useState(false)
 
@@ -114,6 +115,7 @@ export default function DashboardClient({
   const handleEditToggle = () => {
     setEditingProfile((prev) => !prev)
     setHandleInput(profile?.handle ?? '')
+    setDisplayNameInput(profile?.display_name ?? '')
     setBioInput(profile?.bio ?? '')
   }
 
@@ -126,9 +128,11 @@ export default function DashboardClient({
       setSavingProfile(false)
       return
     }
+    const normalizedDisplayName = displayNameInput.trim() || 'Röst-er'
     const updates = {
       user_id: user.id,
       handle: normalizedHandle,
+      display_name: normalizedDisplayName,
       bio: bioInput.trim() || undefined
     }
     const { error } = await supabaseClient.from('profiles').upsert(updates, { onConflict: 'user_id' })

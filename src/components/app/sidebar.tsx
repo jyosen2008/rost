@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import ThemeToggle from '@/components/theme-toggle'
 
 const nav = [
   { href: '/home', label: 'Home', icon: IconHome },
@@ -71,6 +72,9 @@ export default function Sidebar() {
           </Link>
         )
       })}
+      <div className="mt-3 flex w-full items-center justify-center">
+        <ThemeToggle />
+      </div>
     </aside>
   )
 }
