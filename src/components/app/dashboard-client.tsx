@@ -160,7 +160,6 @@ export default function DashboardClient({
               <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Dashboard</p>
               <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">{display.name}</h1>
               <p className="text-sm text-[var(--text-muted)]">{display.handle}</p>
-              <p className="text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">ID: {profileId ?? '—'}</p>
               {display.bio ? <p className="mt-3 max-w-2xl text-sm text-[var(--text-muted)]">{display.bio}</p> : null}
             </div>
 

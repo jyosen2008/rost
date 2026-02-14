@@ -95,7 +95,6 @@ export default function ProfilePage() {
               <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Profile</p>
               <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">{display.displayName}</h1>
               <p className="text-sm text-[var(--text-muted)]">{display.handle}</p>
-              <p className="text-[0.65rem] uppercase tracking-[0.45em] text-[var(--text-subtle)]">ID: {profileId ?? '—'}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
