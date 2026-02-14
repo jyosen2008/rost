@@ -3,30 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import AppShell from '@/components/app/app-shell'
 import PostCard from '@/components/post-card'
-import TagPills from '@/components/tag-pills'
 import { useBookmarks } from '@/hooks/use-bookmarks'
 import { usePostInteractions } from '@/hooks/use-post-interactions'
 import { useSession } from '@/hooks/use-session'
 import { supabaseClient } from '@/lib/supabase-client'
 import type { Post } from '@/lib/db'
-
-const extraMoodTags = [
-  'Archive',
-  'Art',
-  'Notes',
-  'Reflection',
-  'Science',
-  'Letters',
-  'Night',
-  'Stillness',
-  'Dreams',
-  'Soundscape',
-  'Quietude',
-  'Memoir',
-  'Travel',
-  'Memory',
-  'Skyline'
-]
 
 export default function HomeFeedClient({
   posts: initialPosts,
@@ -48,7 +29,9 @@ export default function HomeFeedClient({
     return new Date(best.published_at ?? best.created_at).getTime()
   })
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([])
+  const [hashtagInput, setHashtagInput] = useState('')
+  const [followingIds, setFollowingIds] = useState<string[]>([])
   const [followingIds, setFollowingIds] = useState<string[]>([])
 
   const { bookmarks, toggleBookmark } = useBookmarks()
@@ -146,7 +129,21 @@ export default function HomeFeedClient({
     }
 
     loadFollowing()
-  }, [user?.id])
+  }, [user?.id, setFollowingIds])
+
+  const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim()
+
+  const addHashtagFilter = () => {
+    const normalized = normalizeHashtag(hashtagInput)
+    if (!normalized) {
+      setHashtagInput('')
+      return
+    }
+    if (!selectedHashtags.includes(normalized)) {
+      setSelectedHashtags((prev) => [...prev, normalized])
+    }
+    setHashtagInput('')
+  }
 
   const showNewPosts = () => {
     updateDisplayedPosts(livePosts)
@@ -165,9 +162,9 @@ export default function HomeFeedClient({
   const filteredPosts = useMemo(() => {
     const base = displayPosts.filter((post) => {
       if (selectedCategory && post.category !== selectedCategory) return false
-      if (selectedTags.length > 0) {
-        const postTags = post.tags ?? []
-        if (!selectedTags.some((tag) => postTags.includes(tag))) return false
+      if (selectedHashtags.length > 0) {
+        const postTags = (post.tags ?? []).map((tag) => tag.toLowerCase())
+        if (!selectedHashtags.every((tag) => postTags.includes(tag.toLowerCase()))) return false
       }
       return true
     })
@@ -191,17 +188,16 @@ export default function HomeFeedClient({
       const bDate = new Date(b.published_at ?? b.created_at).getTime()
       return bDate - aDate
     })
-  }, [displayPosts, selectedCategory, selectedTags, followingIds, interactions, preferredTags])
+  }, [displayPosts, selectedCategory, selectedHashtags, followingIds, interactions, preferredTags])
 
-  const toggleMoodTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((current) => current !== tag) : [...prev, tag]
-    )
+  const removeHashtag = (tag: string) => {
+    setSelectedHashtags((prev) => prev.filter((current) => current !== tag))
   }
 
   const clearFilters = () => {
     setSelectedCategory(null)
-    setSelectedTags([])
+    setSelectedHashtags([])
+    setHashtagInput('')
   }
 
   return (
@@ -233,7 +229,7 @@ export default function HomeFeedClient({
           </div>
         )}
 
-        <section className="glass-panel p-5">
+        <section className="glass-panel p-5 space-y-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-2">
               <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Category</p>
@@ -258,24 +254,43 @@ export default function HomeFeedClient({
               Reset filters
             </button>
           </div>
-          <div className="mt-5">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Mood filters</p>
+              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Hashtag filters</p>
               <button
                 type="button"
-                onClick={() => setSelectedTags([])}
+                onClick={() => setSelectedHashtags([])}
                 className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
               >
-                Clear tags
+                Clear hashtags
               </button>
             </div>
-            <div className="mt-3">
-              <TagPills
-                tags={moodTags}
-                selectedTags={selectedTags}
-                onTagToggle={toggleMoodTag}
-                onClear={() => setSelectedTags([])}
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                value={hashtagInput}
+                onChange={(event) => setHashtagInput(event.target.value)}
+                placeholder="Type a hashtag (e.g. #reflection)"
+                className="flex-1 min-w-[180px] rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
               />
+              <button
+                type="button"
+                onClick={addHashtagFilter}
+                className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
+              >
+                Add hashtag
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {selectedHashtags.map((tag) => (
+                <button
+                  key={`hashtag-${tag}`}
+                  type="button"
+                  onClick={() => removeHashtag(tag)}
+                  className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
+                >
+                  #{tag}
+                </button>
+              ))}
             </div>
           </div>
         </section>

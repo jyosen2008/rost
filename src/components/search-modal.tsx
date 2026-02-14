@@ -33,12 +33,15 @@ const SEARCH_MODES = [
   { value: 'posts', label: 'Search for Rösts (Posts)' }
 ]
 
+const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim()
+
 export default function SearchModal({ open, onClose }: SearchModalProps) {
   const [mode, setMode] = useState<SearchMode>('users')
   const [userQuery, setUserQuery] = useState('')
   const [userResults, setUserResults] = useState<ProfileResult[]>([])
   const [postQuery, setPostQuery] = useState('')
   const [postCategory, setPostCategory] = useState<string>('')
+  const [postHashtag, setPostHashtag] = useState('')
   const [postResults, setPostResults] = useState<PostResult[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
@@ -71,6 +74,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
     setUserResults([])
     setPostQuery('')
     setPostCategory('')
+    setPostHashtag('')
     setPostResults([])
   }, [open])
 
@@ -113,6 +117,15 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
       query = query.eq('category', postCategory)
     }
 
+    const hashtagFilters = postHashtag
+      .split(/\s+/)
+      .map(normalizeHashtag)
+      .filter(Boolean)
+
+    if (hashtagFilters.length) {
+      query = query.overlaps('tags', hashtagFilters)
+    }
+
     const { data, error } = await query
     setLoading(false)
     if (error) {
@@ -121,7 +134,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
       return
     }
     setPostResults((data ?? []) as PostResult[])
-  }, [postQuery, postCategory])
+  }, [postQuery, postCategory, postHashtag])
 
   if (!open) {
     return null
@@ -217,6 +230,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
               <label className="text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">
                 Search Röst titles or categories
               </label>
+              <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <input
                   value={postQuery}
@@ -236,13 +250,23 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
                     </option>
                   ))}
                 </select>
-                <button
-                  type="submit"
-                  className="rounded-2xl bg-[var(--accent)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black"
-                >
-                  {loading ? 'Searching…' : 'Search posts'}
-                </button>
               </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Hashtags</label>
+                <input
+                  value={postHashtag}
+                  onChange={(event) => setPostHashtag(event.target.value)}
+                  placeholder="#reflection #night"
+                  className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)] focus:outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="rounded-2xl bg-[var(--accent)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black"
+              >
+                {loading ? 'Searching…' : 'Search posts'}
+              </button>
+            </div>
             </form>
             <div className="space-y-3">
               {postResults.length === 0 ? (
