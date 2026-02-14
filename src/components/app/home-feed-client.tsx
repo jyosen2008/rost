@@ -39,14 +39,41 @@ export default function HomeFeedClient({
 }) {
   const { user } = useSession()
   const [livePosts, setLivePosts] = useState<Post[]>(initialPosts)
+  const [displayPosts, setDisplayPosts] = useState<Post[]>(initialPosts)
+  const [pendingPosts, setPendingPosts] = useState<Post[]>([])
+  const [newPostsCount, setNewPostsCount] = useState(0)
+  const [displayTimestamp, setDisplayTimestamp] = useState<number | null>(() => {
+    if (!initialPosts.length) return null
+    const best = initialPosts[0]
+    return new Date(best.published_at ?? best.created_at).getTime()
+  })
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [followingIds, setFollowingIds] = useState<string[]>([])
 
   const { bookmarks, toggleBookmark } = useBookmarks()
-  const postIds = useMemo(() => livePosts.map((p) => p.id), [livePosts])
+  const postIds = useMemo(() => displayPosts.map((p) => p.id), [displayPosts])
   const interactions = usePostInteractions(postIds)
   const moodTags = useMemo(() => Array.from(new Set([...extraMoodTags, ...tags])), [tags])
+
+  const getTimestamp = (post: Post | null | undefined) => {
+    if (!post) return null
+    return new Date(post.published_at ?? post.created_at).getTime()
+  }
+
+  const updateDisplayedPosts = useCallback((posts: Post[]) => {
+    if (!posts.length) {
+      setDisplayPosts([])
+      setDisplayTimestamp(null)
+      setPendingPosts([])
+      setNewPostsCount(0)
+      return
+    }
+    setDisplayPosts(posts)
+    setDisplayTimestamp(getTimestamp(posts[0]))
+    setPendingPosts([])
+    setNewPostsCount(0)
+  }, [])
 
   const fetchPosts = useCallback(async () => {
     const { data, error } = await supabaseClient
@@ -60,8 +87,30 @@ export default function HomeFeedClient({
       return
     }
 
-    setLivePosts((data ?? []) as Post[])
-  }, [])
+    const posts = (data ?? []) as Post[]
+    setLivePosts(posts)
+
+    if (!posts.length) {
+      return
+    }
+
+    const newestTimestamp = getTimestamp(posts[0])
+    if (!displayTimestamp) {
+      updateDisplayedPosts(posts)
+      return
+    }
+
+    if (newestTimestamp && newestTimestamp > (displayTimestamp ?? 0)) {
+      const newCount = posts.filter((post) => {
+        const ts = getTimestamp(post)
+        return ts ? ts > (displayTimestamp ?? 0) : false
+      }).length
+      setPendingPosts(posts)
+      setNewPostsCount(newCount)
+    } else {
+      updateDisplayedPosts(posts)
+    }
+  }, [displayTimestamp, updateDisplayedPosts])
 
   useEffect(() => {
     fetchPosts()
@@ -99,8 +148,22 @@ export default function HomeFeedClient({
     loadFollowing()
   }, [user?.id])
 
+  const showNewPosts = () => {
+    updateDisplayedPosts(livePosts)
+  }
+
+  const preferredTags = useMemo(() => {
+    const likedSet = new Set(interactions.likedPosts)
+    const tagsSet = new Set<string>()
+    displayPosts.forEach((post) => {
+      if (!likedSet.has(post.id)) return
+      ;(post.tags ?? []).forEach((tag) => tagsSet.add(tag))
+    })
+    return tagsSet
+  }, [displayPosts, interactions.likedPosts])
+
   const filteredPosts = useMemo(() => {
-    const base = livePosts.filter((post) => {
+    const base = displayPosts.filter((post) => {
       if (selectedCategory && post.category !== selectedCategory) return false
       if (selectedTags.length > 0) {
         const postTags = post.tags ?? []
@@ -110,15 +173,25 @@ export default function HomeFeedClient({
     })
 
     const followingSet = new Set(followingIds)
+
+    const score = (post: Post) => {
+      let value = 0
+      if (post.author_id && followingSet.has(post.author_id)) value += 200
+      if (interactions.likedPosts.includes(post.id)) value += 150
+      const postTags = post.tags ?? []
+      if (postTags.some((tag) => preferredTags.has(tag))) value += 60
+      value += (interactions.likeCounts[post.id] ?? 0) * 3
+      return value
+    }
+
     return [...base].sort((a, b) => {
-      const aFollowed = a.author_id && followingSet.has(a.author_id) ? 1 : 0
-      const bFollowed = b.author_id && followingSet.has(b.author_id) ? 1 : 0
-      if (aFollowed !== bFollowed) return bFollowed - aFollowed
+      const diff = score(b) - score(a)
+      if (diff !== 0) return diff
       const aDate = new Date(a.published_at ?? a.created_at).getTime()
       const bDate = new Date(b.published_at ?? b.created_at).getTime()
       return bDate - aDate
     })
-  }, [livePosts, selectedCategory, selectedTags, followingIds])
+  }, [displayPosts, selectedCategory, selectedTags, followingIds, interactions, preferredTags])
 
   const toggleMoodTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -146,6 +219,19 @@ export default function HomeFeedClient({
             </div>
           </div>
         </header>
+
+        {newPostsCount > 0 && (
+          <div className="glass-panel mx-4 flex items-center justify-between gap-4 rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-[var(--text-primary)] shadow-lg shadow-black/10 sm:mx-0">
+            <span>{newPostsCount} new {newPostsCount === 1 ? 'post' : 'posts'} available</span>
+            <button
+              type="button"
+              onClick={showNewPosts}
+              className="rounded-full border border-[var(--card-border)] bg-[var(--accent)] px-4 py-1 text-xs text-black"
+            >
+              Show latest
+            </button>
+          </div>
+        )}
 
         <section className="glass-panel p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
