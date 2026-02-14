@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabaseClient } from '@/lib/supabase-client'
 
 type ProfileResult = {
@@ -27,6 +27,11 @@ type SearchModalProps = {
   open: boolean
   onClose: () => void
 }
+
+const SEARCH_MODES = [
+  { value: 'users', label: 'Search for Röst-ers (Users)' },
+  { value: 'posts', label: 'Search for Rösts (Posts)' }
+]
 
 export default function SearchModal({ open, onClose }: SearchModalProps) {
   const [mode, setMode] = useState<SearchMode>('users')
@@ -118,14 +123,6 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
     setPostResults((data ?? []) as PostResult[])
   }, [postQuery, postCategory])
 
-  const captions = useMemo(
-    () => [
-      { value: 'users', label: 'Search for Röst-ers (Users)' },
-      { value: 'posts', label: 'Search for Rösts (Posts)' }
-    ],
-    []
-  )
-
   if (!open) {
     return null
   }
@@ -147,7 +144,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
           </button>
         </div>
         <div className="flex flex-wrap gap-3">
-          {captions.map((item) => (
+          {SEARCH_MODES.map((item) => (
             <button
               key={item.value}
               type="button"
