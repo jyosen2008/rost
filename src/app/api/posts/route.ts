@@ -8,7 +8,7 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, '')
 
 export async function POST(request: NextRequest) {
-  const { title, content, excerpt, category, tags, coverUrl } = await request.json()
+  const { title, content, excerpt, category, tags, coverUrl, authorId, authorName } = await request.json()
 
   if (!title || !content) {
     return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
@@ -28,7 +28,9 @@ export async function POST(request: NextRequest) {
     category,
     tags: tagArray,
     cover_url: coverUrl,
-    published_at: new Date().toISOString()
+    published_at: new Date().toISOString(),
+    author_id: authorId ?? null,
+    author_name: authorName ?? null
   })
 
   if (error) {

@@ -2,6 +2,8 @@
 
 import ImageUploader from './image-uploader'
 import { useMemo, useState } from 'react'
+import { useSession } from '@/hooks/use-session'
+import { useProfileStats } from '@/hooks/use-profile-stats'
 
 type PostCreatorProps = {
   categories: string[]
@@ -22,6 +24,8 @@ const moodOptions = [
 ]
 
 export default function PostCreator({ categories, tags }: PostCreatorProps) {
+  const { user } = useSession()
+  const { profile } = useProfileStats(user?.id ?? null)
   const [title, setTitle] = useState('')
   const [excerpt, setExcerpt] = useState('')
   const [content, setContent] = useState('')
@@ -53,6 +57,10 @@ export default function PostCreator({ categories, tags }: PostCreatorProps) {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (!user?.id) {
+      setStatus('Sign in to publish a piece.')
+      return
+    }
     setLoading(true)
     setStatus(null)
     try {
@@ -68,7 +76,9 @@ export default function PostCreator({ categories, tags }: PostCreatorProps) {
           content,
           category,
           tags: combinedTags,
-          coverUrl
+          coverUrl,
+          authorId: user.id,
+          authorName: profile?.display_name ?? user.email ?? 'Röst storyteller'
         })
       })
       if (!response.ok) {
