@@ -4,6 +4,8 @@ import { Post } from '@/lib/db'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { buildShareText, getPostFeatureMeta, moodReactions } from '@/lib/rost-features'
+import { useEffect, useMemo, useState } from 'react'
 
 type PostCardProps = {
   post: Post
@@ -22,19 +24,64 @@ export default function PostCard({
   liked = false,
   onToggleLike
 }: PostCardProps) {
+  const meta = useMemo(() => getPostFeatureMeta(post), [post])
+  const [reaction, setReaction] = useState<string | null>(null)
+  const [shareStatus, setShareStatus] = useState('')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    setReaction(window.localStorage.getItem(`rost-reaction-${post.id}`))
+  }, [post.id])
+
+  const selectReaction = (key: string) => {
+    const next = reaction === key ? null : key
+    setReaction(next)
+    if (typeof window === 'undefined') return
+    if (next) {
+      window.localStorage.setItem(`rost-reaction-${post.id}`, next)
+    } else {
+      window.localStorage.removeItem(`rost-reaction-${post.id}`)
+    }
+  }
+
+  const copyShareCard = async () => {
+    if (typeof window === 'undefined') return
+    await navigator.clipboard.writeText(`${buildShareText(post)}\n${window.location.origin}/posts/${post.slug ?? post.id}`)
+    setShareStatus('Copied')
+    window.setTimeout(() => setShareStatus(''), 1600)
+  }
+
   return (
     <motion.article
       whileHover={{ y: -4 }}
-      className="group transform rounded-3xl border border-white/40 bg-white/70 p-6 shadow-2xl shadow-peat/10 transition"
+      className="group transform rounded-[28px] border border-[var(--card-border)] bg-[var(--panel-bg)] p-6 shadow-2xl shadow-black/10 transition"
     >
-      <div className="flex items-center justify-between text-xs uppercase text-peat/60">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs uppercase text-[var(--text-subtle)]">
         <span>{post.category ?? 'Uncategorized'}</span>
         <span>{new Date(post.published_at ?? post.created_at).toLocaleDateString()}</span>
       </div>
-      <h3 className="mt-3 text-2xl font-semibold leading-tight tracking-tight text-peat">
+      <div className="mt-3 flex flex-wrap gap-2">
+        {meta.isQuickNote ? <FeatureBadge label="Quick note" /> : null}
+        {meta.isQuoteReact ? <FeatureBadge label="Quote react" /> : null}
+        {meta.seriesName ? <FeatureBadge label={`Series: ${meta.seriesName}`} /> : null}
+        {meta.episodeNumber ? <FeatureBadge label={`Ep ${meta.episodeNumber}`} /> : null}
+        {meta.isDrop ? <FeatureBadge label={meta.dropLabel ? `Drop: ${meta.dropLabel}` : 'Drop'} /> : null}
+        {meta.chainName ? <FeatureBadge label={`Chain: ${meta.chainName}`} /> : null}
+      </div>
+      <h3 className="mt-3 text-2xl font-semibold leading-tight text-[var(--text-primary)]">
         {post.title}
       </h3>
-      <p className="mt-4 text-base text-peat/70">{post.excerpt ?? 'Ideas worth sharing'}</p>
+      <p className="mt-4 text-base text-[var(--text-muted)]">{post.excerpt ?? 'Ideas worth sharing'}</p>
+      {meta.isQuoteReact && meta.quoteUrl ? (
+        <a
+          href={meta.quoteUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 block rounded-2xl border border-[var(--card-border)] bg-[var(--accent-soft)] p-4 text-sm text-[var(--text-muted)]"
+        >
+          Quote-reacting to: <span className="text-[var(--accent)]">{meta.quoteUrl}</span>
+        </a>
+      ) : null}
       {post.cover_url ? (
         <div className="my-4 h-44 overflow-hidden rounded-2xl">
           <Image
@@ -50,10 +97,26 @@ export default function PostCard({
         {(post.tags ?? []).map((tag) => (
           <span
             key={`${post.id}-${tag}`}
-            className="rounded-full border border-sage/40 bg-sage/10 px-3 py-1 font-medium text-sage"
+            className="rounded-full border border-[var(--card-border)] bg-[var(--accent-soft)] px-3 py-1 font-medium text-[var(--accent)]"
           >
-            {tag}
+            #{tag}
           </span>
+        ))}
+      </div>
+      <div className="mt-5 flex flex-wrap gap-2">
+        {moodReactions.map((mood) => (
+          <button
+            key={mood.key}
+            type="button"
+            onClick={() => selectReaction(mood.key)}
+            className={`rounded-full border px-3 py-1 text-[0.7rem] font-semibold ${
+              reaction === mood.key
+                ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
+                : 'border-[var(--card-border)] text-[var(--text-muted)]'
+            }`}
+          >
+            {mood.label}
+          </button>
         ))}
       </div>
       <div className="mt-6 space-y-3">
@@ -82,6 +145,13 @@ export default function PostCard({
             </Link>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={copyShareCard}
+              className="rounded-full border border-[var(--card-border)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--text-muted)]"
+            >
+              {shareStatus || 'Share card'}
+            </button>
             {typeof onBookmarkToggle === 'function' ? (
               <button
                 type="button"
@@ -100,13 +170,13 @@ export default function PostCard({
             ) : null}
             <Link
               href={`/posts/${post.slug ?? post.id}`}
-              className="text-sm font-semibold uppercase tracking-[0.3em] text-ember"
+              className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
             >
-              Read
+              Read {meta.readingMinutes}m
             </Link>
           </div>
         </div>
-        <div className="text-sm font-light text-peat/60">
+        <div className="text-sm font-light text-[var(--text-subtle)]">
           By{' '}
           <Link
             href={`/profiles/${(post.author_name ?? 'guest').toLowerCase().replace(/\s+/g, '-')}`}
@@ -117,5 +187,13 @@ export default function PostCard({
         </div>
       </div>
     </motion.article>
+  )
+}
+
+function FeatureBadge({ label }: { label: string }) {
+  return (
+    <span className="rounded-full border border-[var(--card-border)] bg-[var(--accent-soft)] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">
+      {label}
+    </span>
   )
 }

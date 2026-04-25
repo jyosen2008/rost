@@ -28,7 +28,7 @@ export async function getPublishedPosts({
   let query = supabaseServer
     .from('posts')
     .select(
-      'id, title, slug, excerpt, cover_url, category, tags, content, published_at, created_at, author_name'
+      'id, title, slug, excerpt, cover_url, category, tags, content, published_at, created_at, author_name, author_id'
     )
     .order('published_at', { ascending: false })
     .limit(30)
@@ -54,7 +54,7 @@ export async function getPublishedPosts({
 export async function getPostBySlug(slug: string) {
   const { data, error } = await supabaseServer
     .from('posts')
-    .select('id, title, slug, excerpt, cover_url, category, tags, content, published_at, created_at, author_name')
+    .select('id, title, slug, excerpt, cover_url, category, tags, content, published_at, created_at, author_name, author_id')
     .eq('slug', slug)
     .single()
 

@@ -117,7 +117,12 @@ insert into categories (name) values
   ('Personal Essays'),
   ('Community Notes'),
   ('Collective Journals'),
-  ('Creative Process')
+  ('Creative Process'),
+  ('Quick Notes'),
+  ('Quote Reacts'),
+  ('Drops'),
+  ('Series'),
+  ('Chains')
 on conflict do nothing;
 
 insert into tags (name) values
@@ -125,5 +130,14 @@ insert into tags (name) values
   ('art'),
   ('science'),
   ('notes'),
-  ('archive')
+  ('archive'),
+  ('quick-note'),
+  ('quote-react'),
+  ('drop'),
+  ('felt-this'),
+  ('need-part-2')
 on conflict do nothing;
+
+create index if not exists posts_tags_gin_idx on posts using gin (tags);
+create index if not exists posts_category_idx on posts (category);
+create index if not exists posts_author_published_idx on posts (author_id, published_at desc);

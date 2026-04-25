@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import AppShell from '@/components/app/app-shell'
+import CulturePulse from '@/components/app/culture-pulse'
 import PostCard from '@/components/post-card'
 import { useBookmarks } from '@/hooks/use-bookmarks'
 import { usePostInteractions } from '@/hooks/use-post-interactions'
@@ -144,6 +145,12 @@ export default function HomeFeedClient({
     setHashtagInput('')
   }
 
+  const addSingleHashtagFilter = (tag: string) => {
+    const normalized = normalizeHashtag(tag)
+    if (!normalized) return
+    setSelectedHashtags((prev) => Array.from(new Set([...prev, normalized])))
+  }
+
   const showNewPosts = () => {
     updateDisplayedPosts(livePosts)
   }
@@ -208,12 +215,18 @@ export default function HomeFeedClient({
               <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Home</p>
               <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Your feed</h1>
               <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Fresh posts curated from people you follow and the topics you love. Tap the search icon in the
-                sidebar to find Röst-ers or Rösts instantly.
+                Fresh posts, quick notes, quote-reacts, drops, chains, and series from people you follow and the
+                topics you love.
               </p>
             </div>
           </div>
         </header>
+
+        <CulturePulse
+          posts={displayPosts}
+          onSelectTag={addSingleHashtagFilter}
+          onSelectCategory={setSelectedCategory}
+        />
 
         {newPostsCount > 0 && (
           <div className="glass-panel mx-4 flex items-center justify-between gap-4 rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-[var(--text-primary)] shadow-lg shadow-black/10 sm:mx-0">

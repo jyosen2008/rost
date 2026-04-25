@@ -7,6 +7,11 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
+const uniqueSlug = (title: string) => {
+  const base = slugify(title) || 'rost-post'
+  return `${base}-${Date.now().toString(36)}`
+}
+
 export async function POST(request: NextRequest) {
   const { title, content, excerpt, category, tags, coverUrl, authorId, authorName } = await request.json()
 
@@ -23,7 +28,7 @@ export async function POST(request: NextRequest) {
   const categoryKey = category?.trim() ? category : null
   const { data, error } = await supabaseServer.from('posts').insert({
     title,
-    slug: slugify(title),
+    slug: uniqueSlug(title),
     content,
     excerpt,
     category: categoryKey,
@@ -32,7 +37,7 @@ export async function POST(request: NextRequest) {
     published_at: new Date().toISOString(),
     author_id: authorId ?? null,
     author_name: authorName ?? null
-  })
+  }).select('id, title, slug, excerpt, cover_url, category, tags, content, published_at, created_at, author_name, author_id')
 
   if (error) {
     console.error(error)
