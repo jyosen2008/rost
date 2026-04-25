@@ -14,16 +14,17 @@ export default function RoomNavigator({ categories, posts, selectedCategory, onS
   const rooms = getRoomProfiles(categories, posts)
 
   return (
-    <section className="vibe-panel p-5">
+    <section className="desk-card p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">ROST rooms</p>
-          <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Pick the room energy</h2>
+          <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Broad spaces for different kinds of writing</h2>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Rooms are categories with live signals underneath them.</p>
         </div>
         <button
           type="button"
           onClick={() => onSelectCategory(null)}
-          className="rounded-full border border-[var(--card-border)] px-3 py-1 text-xs font-semibold text-[var(--text-muted)]"
+          className="action-pill px-3 py-1 text-xs font-semibold"
         >
           All
         </button>
@@ -34,11 +35,8 @@ export default function RoomNavigator({ categories, posts, selectedCategory, onS
             key={room.name}
             type="button"
             onClick={() => onSelectCategory(room.name)}
-            className={`rounded-[22px] border p-4 text-left transition ${
-              selectedCategory === room.name
-                ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
-                : 'border-[var(--card-border)] bg-[var(--panel-bg)]'
-            }`}
+            className="feature-chip p-4 text-left transition hover:-translate-y-0.5 hover:border-[var(--accent)]"
+            data-active={selectedCategory === room.name}
           >
             <div className="flex items-start justify-between gap-3">
               <h3 className="text-base font-semibold text-[var(--text-primary)]">{room.name}</h3>

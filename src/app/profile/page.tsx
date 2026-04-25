@@ -77,10 +77,10 @@ export default function ProfilePage() {
   if (sessionLoading || profileLoading) {
     return (
       <AppShell>
-        <section className="glass-panel animate-pulse p-6">
-          <h1 className="h-6 w-40 rounded bg-white/30" />
-          <p className="mt-3 h-4 w-48 rounded bg-white/20" />
-          <p className="mt-2 h-3 w-32 rounded bg-white/20" />
+        <section className="desk-card animate-pulse p-6">
+          <h1 className="h-6 w-40 rounded bg-[var(--surface-raised)]" />
+          <p className="mt-3 h-4 w-48 rounded bg-[var(--surface-raised)]" />
+          <p className="mt-2 h-3 w-32 rounded bg-[var(--surface-raised)]" />
         </section>
       </AppShell>
     )
@@ -89,7 +89,7 @@ export default function ProfilePage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <header className="glass-panel rounded-3xl border border-white/20 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_60%)] p-6 text-peat shadow-2xl shadow-peat/20 dark:border-white/0 dark:bg-peat/80">
+        <header className="desk-card overflow-hidden p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Profile</p>
@@ -99,13 +99,13 @@ export default function ProfilePage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={copyProfileLink}
-                className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-5 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-[var(--text-muted)]"
+                className="action-pill px-5 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.35em]"
               >
                 Copy link
               </button>
               <Link
                 href="/dashboard"
-                className="rounded-full bg-[var(--accent)] px-5 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-black"
+                className="primary-pill px-5 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.35em]"
               >
                 Manage posts
               </Link>
@@ -115,28 +115,28 @@ export default function ProfilePage() {
             {display.bio || 'This is your space to share a short bio. Make it personal, poetic, precise, or all three.'}
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left">
+            <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4 text-left">
               <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.posts}</p>
               <p className="mt-1 text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Posts</p>
             </div>
-            <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left">
+            <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4 text-left">
               <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.followers}</p>
               <p className="mt-1 text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Followers</p>
             </div>
-            <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left">
+            <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4 text-left">
               <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.following}</p>
               <p className="mt-1 text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Following</p>
             </div>
           </div>
         </header>
 
-        <section className="glass-panel space-y-4 rounded-3xl border border-white/20 p-6 text-[var(--text-primary)] shadow-lg shadow-peat/30">
+        <section className="desk-card space-y-4 p-6 text-[var(--text-primary)]">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.35em] text-[var(--text-subtle)]">Profile details</p>
             <button
               type="button"
               onClick={handleEditToggle}
-              className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
+              className="action-pill px-4 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.3em]"
             >
               {editingProfile ? 'Cancel' : 'Edit profile'}
             </button>
@@ -159,26 +159,26 @@ export default function ProfilePage() {
                 value={handleInput}
                 onChange={(event) => setHandleInput(event.target.value)}
                 placeholder="Handle (e.g. @story)"
-                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none"
+                className="field-control px-4 py-3 text-sm"
               />
               <input
                 value={displayNameInput}
                 onChange={(event) => setDisplayNameInput(event.target.value)}
                 placeholder="Display name"
-                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none"
+                className="field-control px-4 py-3 text-sm"
               />
               <textarea
                 value={bioInput}
                 onChange={(event) => setBioInput(event.target.value)}
                 rows={3}
                 placeholder="Short bio"
-                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none"
+                className="field-control px-4 py-3 text-sm"
               />
               <button
                 type="button"
                 onClick={saveProfileEdits}
                 disabled={savingProfile}
-                className="w-full rounded-3xl bg-[var(--accent)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black"
+                className="primary-pill w-full px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em]"
               >
                 {savingProfile ? 'Saving…' : 'Save profile'}
               </button>

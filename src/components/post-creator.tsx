@@ -13,7 +13,42 @@ type PostCreatorProps = {
   tags?: string[]
 }
 
-export default function PostCreator({ categories }: PostCreatorProps) {
+type PostFormat = 'story' | 'quick-note' | 'quote-react' | 'response-essay' | 'drop'
+
+const formatOptions: Array<{ value: PostFormat; label: string; description: string; hint: string }> = [
+  {
+    value: 'story',
+    label: 'Story',
+    description: 'A full personal essay, scene, or reflection.',
+    hint: 'Best when you want readers to settle in.'
+  },
+  {
+    value: 'quick-note',
+    label: 'Quick note',
+    description: 'A short take, update, or sharp thought.',
+    hint: 'Best for fast, group-chat energy.'
+  },
+  {
+    value: 'quote-react',
+    label: 'Quote react',
+    description: 'Respond to an article, post, or cultural moment.',
+    hint: 'Best when your angle starts from someone else.'
+  },
+  {
+    value: 'response-essay',
+    label: 'Duet essay',
+    description: 'Write alongside another ROST piece.',
+    hint: 'Best for thoughtful back-and-forth chains.'
+  },
+  {
+    value: 'drop',
+    label: 'Live drop',
+    description: 'Schedule or frame a post like an event.',
+    hint: 'Best for launches, series, and reveals.'
+  }
+]
+
+export default function PostCreator({ categories, tags = [] }: PostCreatorProps) {
   const { user } = useSession()
   const { profile } = useProfileStats(user?.id ?? null)
   const { markDraft } = useRostStreak()
@@ -26,7 +61,7 @@ export default function PostCreator({ categories }: PostCreatorProps) {
   const [loading, setLoading] = useState(false)
   const [tagInput, setTagInput] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [format, setFormat] = useState<'story' | 'quick-note' | 'quote-react' | 'response-essay' | 'drop'>('story')
+  const [format, setFormat] = useState<PostFormat>('story')
   const [quoteUrl, setQuoteUrl] = useState('')
   const [responseUrl, setResponseUrl] = useState('')
   const [seriesName, setSeriesName] = useState('')
@@ -37,6 +72,8 @@ export default function PostCreator({ categories }: PostCreatorProps) {
   const [anonymous, setAnonymous] = useState(false)
 
   const normalizeTag = (value: string) => value.replace(/^#+/, '').trim().toLowerCase()
+  const activeFormat = formatOptions.find((option) => option.value === format) ?? formatOptions[0]
+  const suggestedTags = tags.slice(0, 8)
 
   const addTag = () => {
     const raw = normalizeTag(tagInput)
@@ -48,6 +85,17 @@ export default function PostCreator({ categories }: PostCreatorProps) {
 
   const addTags = (tags: string[]) => {
     setSelectedTags((prev) => Array.from(new Set([...prev, ...tags.map(normalizeTag).filter(Boolean)])))
+  }
+
+  const removeTag = (tag: string) => {
+    setSelectedTags((prev) => prev.filter((current) => current !== tag))
+  }
+
+  const insertContent = (value: string, placement: 'prepend' | 'append') => {
+    setContent((prev) => {
+      if (!prev.trim()) return value
+      return placement === 'prepend' ? `${value}\n\n${prev}` : `${prev}\n\n${value}`
+    })
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -121,53 +169,61 @@ export default function PostCreator({ categories }: PostCreatorProps) {
   }
 
   return (
-    <section className="glass-panel p-6">
-      <div className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">
-        <span>New dispatch</span>
+    <section className="desk-card overflow-hidden">
+      <div className="border-b border-[var(--card-border)] bg-[var(--surface-soft)] p-5">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-[var(--text-subtle)]">Create studio</p>
+            <h2 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Make a post people understand fast</h2>
+            <p className="mt-1 max-w-2xl text-sm text-[var(--text-muted)]">
+              Pick the kind of piece, write with guidance, then add room and tags only when they help readers find it.
+            </p>
+          </div>
+          <div className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--text-muted)]">
+            {activeFormat.label}
+          </div>
+        </div>
       </div>
-      <form onSubmit={handleSubmit} className="mt-4 grid gap-4">
-        <div className="grid gap-2 sm:grid-cols-5">
-          {[
-            ['story', 'Story'],
-            ['quick-note', 'Quick note'],
-            ['quote-react', 'Quote react'],
-            ['response-essay', 'Duet essay'],
-            ['drop', 'Drop']
-          ].map(([value, label]) => (
+      <form onSubmit={handleSubmit} className="grid gap-5 p-5">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {formatOptions.map((option) => (
             <button
-              key={value}
+              key={option.value}
               type="button"
-              onClick={() => setFormat(value as typeof format)}
-              className={`rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] ${
-                format === value
-                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
-                  : 'border-[var(--card-border)] text-[var(--text-muted)]'
-              }`}
+              onClick={() => setFormat(option.value)}
+              className="feature-chip p-4 text-left transition hover:-translate-y-0.5 hover:border-[var(--accent)]"
+              data-active={format === option.value}
             >
-              {label}
+              <span className="block text-sm font-semibold text-[var(--text-primary)]">{option.label}</span>
+              <span className="mt-1 block text-xs text-[var(--text-muted)]">{option.description}</span>
+              <span className="mt-3 block text-[0.65rem] uppercase tracking-[0.24em] text-[var(--text-subtle)]">{option.hint}</span>
             </button>
           ))}
+        </div>
+        <div className="rounded-3xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-subtle)]">Step 1: Draft the idea</p>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">{activeFormat.description} {activeFormat.hint}</p>
         </div>
         <input
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          placeholder="Title"
+          placeholder="Working title, even if it is messy"
           required
-          className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-lg font-semibold text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none"
+          className="field-control px-4 py-3 text-lg font-semibold"
         />
         <input
           value={excerpt}
           onChange={(event) => setExcerpt(event.target.value)}
-          placeholder="Short summary"
-          className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+          placeholder="Promise to the reader in one line"
+          className="field-control px-4 py-3 text-sm"
         />
         <textarea
           value={content}
           onChange={(event) => setContent(event.target.value)}
-          placeholder={format === 'quick-note' ? 'Drop a sharp thought, update, or take' : 'Write something beautiful for the community'}
+          placeholder={format === 'quick-note' ? 'Start with the sharpest version of the thought.' : 'Start with the moment, feeling, or argument. The assistant below will help shape it.'}
           required
           rows={format === 'quick-note' ? 3 : 6}
-          className="h-36 rounded-3xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-base text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none"
+          className="field-control min-h-40 px-4 py-3 text-base leading-7"
         />
         <AiCoEditor
           title={title}
@@ -177,7 +233,7 @@ export default function PostCreator({ categories }: PostCreatorProps) {
           chainName={chainName}
           onTitle={setTitle}
           onExcerpt={setExcerpt}
-          onContent={(value) => setContent((prev) => (prev.trim() ? `${value}\n\n${prev}` : value))}
+          onContent={insertContent}
           onAddTags={addTags}
         />
         {format === 'quote-react' ? (
@@ -185,7 +241,7 @@ export default function PostCreator({ categories }: PostCreatorProps) {
             value={quoteUrl}
             onChange={(event) => setQuoteUrl(event.target.value)}
             placeholder="Paste the post, article, or cultural moment you are reacting to"
-            className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+            className="field-control px-4 py-3 text-sm"
           />
         ) : null}
         {format === 'response-essay' ? (
@@ -193,28 +249,32 @@ export default function PostCreator({ categories }: PostCreatorProps) {
             value={responseUrl}
             onChange={(event) => setResponseUrl(event.target.value)}
             placeholder="Paste the ROST post or article you are responding to"
-            className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+            className="field-control px-4 py-3 text-sm"
           />
         ) : null}
+        <div className="rounded-3xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-subtle)]">Step 2: Help readers find it</p>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Rooms are broad spaces. Tags are specific signals. Chains and series make posts feel connected.</p>
+        </div>
         <div className="grid gap-3 sm:grid-cols-3">
           <input
             value={seriesName}
             onChange={(event) => setSeriesName(event.target.value)}
             placeholder="Series name"
-            className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+            className="field-control px-4 py-3 text-sm"
           />
           <input
             value={episodeNumber}
             onChange={(event) => setEpisodeNumber(event.target.value.replace(/[^0-9]/g, ''))}
             placeholder="Episode #"
             inputMode="numeric"
-            className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+            className="field-control px-4 py-3 text-sm"
           />
           <input
             value={chainName}
             onChange={(event) => setChainName(event.target.value)}
             placeholder="Chain prompt"
-            className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+            className="field-control px-4 py-3 text-sm"
           />
         </div>
         {format === 'drop' ? (
@@ -223,17 +283,17 @@ export default function PostCreator({ categories }: PostCreatorProps) {
               value={dropLabel}
               onChange={(event) => setDropLabel(event.target.value)}
               placeholder="Drop label, launch theme, or event name"
-              className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+              className="field-control px-4 py-3 text-sm"
             />
             <input
               type="datetime-local"
               value={dropAt}
               onChange={(event) => setDropAt(event.target.value)}
-              className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+              className="field-control px-4 py-3 text-sm"
             />
           </div>
         ) : null}
-        <label className="flex items-center justify-between gap-4 rounded-2xl border border-[var(--card-border)] bg-[var(--surface-raised)] px-4 py-3 text-sm text-[var(--text-muted)]">
+        <label className="flex items-center justify-between gap-4 rounded-3xl border border-[var(--card-border)] bg-[var(--surface-raised)] px-4 py-3 text-sm text-[var(--text-muted)]">
           <span>
             <span className="block font-semibold text-[var(--text-primary)]">Anonymous verified story</span>
             <span className="text-xs text-[var(--text-subtle)]">Your account stays attached privately, public readers see Anonymous ROST-er.</span>
@@ -249,7 +309,7 @@ export default function PostCreator({ categories }: PostCreatorProps) {
           <select
             value={category}
             onChange={(event) => setCategory(event.target.value)}
-            className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm text-[var(--text-primary)]"
+            className="field-control max-w-xs px-4 py-2 text-sm"
           >
             <option value="">Choose category</option>
             {categories.map((option) => (
@@ -266,25 +326,41 @@ export default function PostCreator({ categories }: PostCreatorProps) {
               value={tagInput}
               onChange={(event) => setTagInput(event.target.value)}
               placeholder="Add a hashtag (e.g. #reflection)"
-              className="flex-1 min-w-[180px] rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+              className="field-control min-w-[180px] flex-1 px-4 py-2 text-sm"
             />
             <button
               type="button"
               onClick={addTag}
-              className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
+              className="action-pill px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
             >
               Add hashtag
             </button>
           </div>
+          {suggestedTags.length > 0 ? (
+            <div className="flex flex-wrap gap-2 pt-1">
+              {suggestedTags.map((tag) => (
+                <button
+                  key={`suggested-${tag}`}
+                  type="button"
+                  onClick={() => addTags([tag])}
+                  className="feature-chip px-3 py-1 text-xs font-semibold"
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           {selectedTags.map((tag) => (
-            <span
+            <button
               key={`selected-${tag}`}
-              className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
+              type="button"
+              onClick={() => removeTag(tag)}
+              className="feature-chip px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent)]"
             >
-              #{tag}
-            </span>
+              #{tag} x
+            </button>
           ))}
         </div>
         <ImageUploader onUpload={(url) => setCoverUrl(url)} />
@@ -292,12 +368,12 @@ export default function PostCreator({ categories }: PostCreatorProps) {
           value={coverUrl}
           onChange={(event) => setCoverUrl(event.target.value)}
           placeholder="Cover image URL (optional)"
-          className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+          className="field-control px-4 py-3 text-sm"
         />
         <button
           type="submit"
           disabled={loading}
-          className="rounded-3xl bg-[var(--accent)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white"
+          className="primary-pill px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? 'Publishing…' : 'Share with Röst'}
         </button>

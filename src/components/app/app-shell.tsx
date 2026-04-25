@@ -20,9 +20,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <div className="grid gap-6 lg:grid-cols-[72px,1fr]">
+      <div className="grid gap-4 lg:grid-cols-[88px,1fr]">
         <Sidebar onSearchClick={() => setSearchOpen(true)} />
-        <div className="min-w-0 space-y-6">{children}</div>
+        <main className="min-w-0 space-y-6 pb-16 lg:pb-0">{children}</main>
       </div>
     </>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import AppShell from '@/components/app/app-shell'
 import CulturePulse from '@/components/app/culture-pulse'
 import RoomNavigator from '@/components/app/room-navigator'
@@ -11,9 +11,19 @@ import { useBookmarks } from '@/hooks/use-bookmarks'
 import { usePostInteractions } from '@/hooks/use-post-interactions'
 import { useSession } from '@/hooks/use-session'
 import { supabaseClient } from '@/lib/supabase-client'
+import { getPostFeatureMeta } from '@/lib/rost-features'
 import type { Post } from '@/lib/db'
 
 const normalizeHashtag = (value: string) => value.replace(/^#+/, '').trim().toLowerCase()
+
+const formatFilters = [
+  { value: '', label: 'All formats' },
+  { value: 'quick-note', label: 'Quick notes' },
+  { value: 'quote-react', label: 'Quote reacts' },
+  { value: 'response-essay', label: 'Duet essays' },
+  { value: 'drop', label: 'Live drops' },
+  { value: 'anonymous-verified', label: 'Anon verified' }
+]
 
 export default function HomeFeedClient({
   posts: initialPosts,
@@ -34,10 +44,13 @@ export default function HomeFeedClient({
     const best = initialPosts[0]
     return new Date(best.published_at ?? best.created_at).getTime()
   })
+  const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedFormat, setSelectedFormat] = useState('')
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([])
   const [hashtagInput, setHashtagInput] = useState('')
   const [followingIds, setFollowingIds] = useState<string[]>([])
+  const deferredSearchQuery = useDeferredValue(searchQuery)
 
   const { bookmarks, toggleBookmark } = useBookmarks()
   const postIds = useMemo(() => displayPosts.map((p) => p.id), [displayPosts])
@@ -169,8 +182,31 @@ export default function HomeFeedClient({
   }, [displayPosts, interactions.likedPosts])
 
   const filteredPosts = useMemo(() => {
+    const normalizedSearch = deferredSearchQuery.trim().toLowerCase()
     const base = displayPosts.filter((post) => {
       if (selectedCategory && post.category !== selectedCategory) return false
+      if (selectedFormat) {
+        const meta = getPostFeatureMeta(post)
+        const postTags = (post.tags ?? []).map((tag) => tag.toLowerCase())
+        const matchesFormat =
+          (selectedFormat === 'quick-note' && meta.isQuickNote) ||
+          (selectedFormat === 'quote-react' && meta.isQuoteReact) ||
+          (selectedFormat === 'response-essay' && meta.isResponseEssay) ||
+          (selectedFormat === 'drop' && meta.isDrop) ||
+          (selectedFormat === 'anonymous-verified' && meta.isAnonymous) ||
+          postTags.includes(selectedFormat)
+        if (!matchesFormat) return false
+      }
+      if (normalizedSearch) {
+        const haystack = [
+          post.title,
+          post.excerpt ?? '',
+          post.category ?? '',
+          post.author_name ?? '',
+          ...(post.tags ?? [])
+        ].join(' ').toLowerCase()
+        if (!haystack.includes(normalizedSearch)) return false
+      }
       if (selectedHashtags.length > 0) {
         const postTags = (post.tags ?? []).map((tag) => tag.toLowerCase())
         if (!selectedHashtags.some((tag) => postTags.includes(tag.toLowerCase()))) return false
@@ -197,14 +233,16 @@ export default function HomeFeedClient({
       const bDate = new Date(b.published_at ?? b.created_at).getTime()
       return bDate - aDate
     })
-  }, [displayPosts, selectedCategory, selectedHashtags, followingIds, interactions, preferredTags])
+  }, [displayPosts, deferredSearchQuery, selectedCategory, selectedFormat, selectedHashtags, followingIds, interactions, preferredTags])
 
   const removeHashtag = (tag: string) => {
     setSelectedHashtags((prev) => prev.filter((current) => current !== tag))
   }
 
   const clearFilters = () => {
+    setSearchQuery('')
     setSelectedCategory(null)
+    setSelectedFormat('')
     setSelectedHashtags([])
     setHashtagInput('')
   }
@@ -212,14 +250,21 @@ export default function HomeFeedClient({
   return (
     <AppShell>
       <div className="space-y-6">
-        <header className="glass-panel p-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <header className="desk-card overflow-hidden p-0">
+          <div className="grid gap-4 p-5 lg:grid-cols-[1fr,280px] lg:items-end">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Home</p>
-              <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">The live ROST room</h1>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Fresh posts, anonymous drops, duet essays, chain prompts, and culture signals from the people you follow.
+              <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Live desk</p>
+              <h1 className="mt-2 max-w-3xl text-4xl font-semibold leading-tight text-[var(--text-primary)]">
+                Read the room without needing a manual.
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm text-[var(--text-muted)]">
+                Fresh posts, anonymous drops, duet essays, live drops, and culture signals are grouped into simple rooms and formats.
               </p>
+            </div>
+            <div className="rounded-3xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4">
+              <p className="text-[0.65rem] uppercase tracking-[0.3em] text-[var(--text-subtle)]">Showing now</p>
+              <p className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">{filteredPosts.length}</p>
+              <p className="text-sm text-[var(--text-muted)]">posts matched to your current lens</p>
             </div>
           </div>
         </header>
@@ -255,55 +300,99 @@ export default function HomeFeedClient({
           </div>
         )}
 
-        <section className="glass-panel p-5 space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-col gap-2">
-              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Category</p>
-              <select
-                value={selectedCategory ?? ''}
-                onChange={(event) => setSelectedCategory(event.target.value || null)}
-                className="w-full rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm text-[var(--text-primary)]"
-              >
-                <option value="">All categories</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
+        <section className="desk-card space-y-5 p-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Explore</p>
+              <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Find your room, format, or signal</h2>
+              <p className="mt-1 text-sm text-[var(--text-muted)]">
+                Search first, then narrow by room, format, and tags. No decoding required.
+              </p>
             </div>
             <button
               type="button"
               onClick={clearFilters}
-              className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
+              className="action-pill px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em]"
             >
               Reset filters
             </button>
           </div>
+
+          <input
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search title, writer, room, or tag"
+            className="field-control px-4 py-3 text-sm"
+          />
+
+          <div className="grid gap-4 xl:grid-cols-[1fr,1fr]">
+            <div className="space-y-2">
+              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Rooms</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory(null)}
+                  className="feature-chip px-3 py-2 text-xs font-semibold"
+                  data-active={!selectedCategory}
+                >
+                  All rooms
+                </button>
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => setSelectedCategory(category)}
+                    className="feature-chip px-3 py-2 text-xs font-semibold"
+                    data-active={selectedCategory === category}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Formats</p>
+              <div className="flex flex-wrap gap-2">
+                {formatFilters.map((item) => (
+                  <button
+                    key={item.value || 'all-formats'}
+                    type="button"
+                    onClick={() => setSelectedFormat(item.value)}
+                    className="feature-chip px-3 py-2 text-xs font-semibold"
+                    data-active={selectedFormat === item.value}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Hashtag filters</p>
+              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Tags</p>
               <button
                 type="button"
                 onClick={() => setSelectedHashtags([])}
                 className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
               >
-                Clear hashtags
+                Clear tags
               </button>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 value={hashtagInput}
                 onChange={(event) => setHashtagInput(event.target.value)}
-                placeholder="Type hashtags (e.g. #reflection #night)"
-                className="flex-1 rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent)] focus:outline-none"
+                placeholder="Type tags, like #reflection #night"
+                className="field-control flex-1 px-4 py-2 text-sm"
               />
               <button
                 type="button"
                 onClick={addHashtagFilter}
-                className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
+                className="action-pill px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
               >
-                Add filter
+                Add tag
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -312,9 +401,9 @@ export default function HomeFeedClient({
                   key={`hashtag-${tag}`}
                   type="button"
                   onClick={() => removeHashtag(tag)}
-                  className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--accent)]"
+                  className="feature-chip px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent)]"
                 >
-                  #{tag}
+                  #{tag} x
                 </button>
               ))}
             </div>

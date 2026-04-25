@@ -156,42 +156,48 @@ export default function DashboardClient({
   return (
     <AppShell>
       <div className="space-y-6">
-        <header className="vibe-panel p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+        <header className="desk-card overflow-hidden p-0">
+          <div className="grid gap-5 p-6 lg:grid-cols-[1fr,300px] lg:items-end">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Dashboard</p>
-              <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">{display.name}</h1>
+              <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Writer studio</p>
+              <h1 className="mt-2 text-4xl font-semibold leading-tight text-[var(--text-primary)]">Welcome back, {display.name}</h1>
               <p className="text-sm text-[var(--text-muted)]">{display.handle}</p>
               {display.bio ? <p className="mt-3 max-w-2xl text-sm text-[var(--text-muted)]">{display.bio}</p> : null}
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setOpenCreate(true)}
-                className="rounded-full bg-[var(--accent)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-black"
-              >
-                Create
-              </button>
-              <button
-                onClick={signOut}
-                className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
-              >
-                Logout
-              </button>
+            <div className="rounded-3xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4">
+              <p className="text-[0.65rem] uppercase tracking-[0.3em] text-[var(--text-subtle)]">Next best move</p>
+              <p className="mt-2 text-sm text-[var(--text-muted)]">
+                Open the create studio, pick a format, and let the writer assistant help shape the piece.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => setOpenCreate(true)}
+                  className="primary-pill px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em]"
+                >
+                  Create
+                </button>
+                <button
+                  onClick={signOut}
+                  className="action-pill px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em]"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 border-t border-[var(--card-border)] bg-[var(--surface-soft)] p-4 sm:grid-cols-3">
             <button
               onClick={() => setOpenFollowers(true)}
-              className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left"
+              className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left transition hover:border-[var(--accent)]"
             >
               <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.followers}</p>
               <p className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--text-subtle)]">Followers</p>
             </button>
             <button
               onClick={() => setOpenFollowing(true)}
-              className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left"
+              className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left transition hover:border-[var(--accent)]"
             >
               <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.following}</p>
               <p className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--text-subtle)]">Following</p>
@@ -208,13 +214,13 @@ export default function DashboardClient({
           <StreakCard />
         </div>
 
-        <section className="vibe-panel p-6 space-y-4">
+        <section className="desk-card p-6 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-subtle)]">Profile details</p>
             <button
               type="button"
               onClick={handleEditToggle}
-              className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)]"
+              className="action-pill px-4 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.3em]"
             >
               {editingProfile ? 'Cancel' : 'Edit profile'}
             </button>
@@ -230,26 +236,26 @@ export default function DashboardClient({
                 value={handleInput}
                 onChange={(event) => setHandleInput(event.target.value)}
                 placeholder="Handle"
-                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)]"
+                className="field-control px-4 py-3 text-sm"
               />
               <input
                 value={displayNameInput}
                 onChange={(event) => setDisplayNameInput(event.target.value)}
                 placeholder="Display name"
-                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)]"
+                className="field-control px-4 py-3 text-sm"
               />
               <textarea
                 value={bioInput}
                 onChange={(event) => setBioInput(event.target.value)}
                 rows={3}
                 placeholder="Short bio"
-                className="w-full rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] px-4 py-3 text-sm text-[var(--text-primary)]"
+                className="field-control px-4 py-3 text-sm"
               />
               <button
                 type="button"
                 onClick={saveProfileEdits}
                 disabled={savingProfile}
-                className="w-full rounded-3xl bg-[var(--accent)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black"
+                className="primary-pill w-full px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em]"
               >
                 {savingProfile ? 'Saving…' : 'Save profile'}
               </button>
@@ -258,7 +264,7 @@ export default function DashboardClient({
           {actionMessage ? <p className="text-xs text-[var(--text-muted)]">{actionMessage}</p> : null}
         </section>
 
-        <section className="vibe-panel p-6 space-y-4">
+        <section className="desk-card p-6 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.35em] text-[var(--text-subtle)]">Your posts</p>
             {myPosts.length > 0 && <span className="text-xs text-[var(--text-muted)]">Auto-updates live</span>}

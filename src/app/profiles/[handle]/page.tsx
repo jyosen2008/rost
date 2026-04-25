@@ -60,7 +60,7 @@ export default async function HandleProfilePage({ params }: { params: { handle: 
 
   return (
     <section className="space-y-6">
-      <div className="glass-panel rounded-3xl border border-white/20 bg-gradient-to-br from-slate-900/80 to-slate-800/60 p-6 text-peat shadow-2xl shadow-peat/30">
+      <div className="desk-card p-6">
         <div className="flex flex-wrap items-center gap-3 text-sm uppercase tracking-[0.4em] text-[var(--text-subtle)]">
           <span>Profile</span>
           <span>·</span>
@@ -74,15 +74,15 @@ export default async function HandleProfilePage({ params }: { params: { handle: 
           {profile.bio || 'This storyteller hasn’t penned a bio yet, but their handle is ready when you are.'}
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left">
+          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4 text-left">
             <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.posts}</p>
             <p className="mt-1 text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Posts</p>
           </div>
-          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left">
+          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4 text-left">
             <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.followers}</p>
             <p className="mt-1 text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Followers</p>
           </div>
-          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-left">
+          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4 text-left">
             <p className="text-3xl font-semibold text-[var(--text-primary)]">{stats.following}</p>
             <p className="mt-1 text-[0.7rem] uppercase tracking-[0.4em] text-[var(--text-subtle)]">Following</p>
           </div>
@@ -90,13 +90,13 @@ export default async function HandleProfilePage({ params }: { params: { handle: 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/profile"
-            className="rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] px-5 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-[var(--text-muted)]"
+            className="action-pill px-5 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.35em]"
           >
             Edit profile
           </Link>
           <Link
             href="/dashboard"
-            className="rounded-full bg-[var(--accent)] px-5 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-black"
+            className="primary-pill px-5 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.35em]"
           >
             Manage posts
           </Link>

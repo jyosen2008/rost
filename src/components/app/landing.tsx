@@ -21,16 +21,16 @@ export default function Landing() {
   }, [loading, user, router])
 
   return (
-    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden rounded-[28px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-6 shadow-2xl shadow-black/30">
+    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden rounded-[34px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-6 shadow-2xl shadow-black/20">
       <WateryBackground />
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr,0.9fr]">
         <div className="space-y-5">
           <p className="text-xs uppercase tracking-[0.5em] text-[var(--text-subtle)]">ROST</p>
           <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-[var(--text-primary)] sm:text-6xl">
-            The writing app with group-chat velocity.
+            A calmer, smarter media room for internet-native writing.
           </h1>
           <p className="max-w-xl text-lg text-[var(--text-muted)]">
-            Anonymous verified stories, duet essays, culture rooms, live drops, and a co-editor that helps every post land sharper.
+            Rooms, duets, digest cards, anonymous verified stories, live drops, and a co-writer that guides the post while you write.
           </p>
           <div className="grid max-w-2xl gap-3 sm:grid-cols-3">
             {['Rooms', 'Digest', 'Duets'].map((item) => (

@@ -58,7 +58,7 @@ export default function PostCard({
   return (
     <motion.article
       whileHover={{ y: -4 }}
-      className="group vibe-panel transform p-6 transition"
+      className="group desk-card transform p-6 transition"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs uppercase text-[var(--text-subtle)]">
         <span>{post.category ?? 'Uncategorized'}</span>
@@ -160,7 +160,7 @@ export default function PostCard({
               Comment
             </Link>
             <span className="rounded-full border border-[var(--card-border)] px-3 py-1 text-xs font-semibold text-[var(--text-muted)]">
-              Heat {heatScore}
+              Heat score {heatScore}
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -169,7 +169,7 @@ export default function PostCard({
               onClick={copyShareCard}
               className="rounded-full border border-[var(--card-border)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--text-muted)]"
             >
-              {shareStatus || 'Share card'}
+              {shareStatus || 'Copy share card'}
             </button>
             {typeof onBookmarkToggle === 'function' ? (
               <button

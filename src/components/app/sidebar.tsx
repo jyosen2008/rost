@@ -74,21 +74,21 @@ export default function Sidebar({ onSearchClick }: SidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="sticky top-6 flex h-fit flex-col items-center gap-3 px-1 py-2 icon-rail">
+    <aside className="fixed bottom-4 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 px-2 py-2 icon-rail lg:sticky lg:left-auto lg:top-6 lg:h-fit lg:translate-x-0 lg:flex-col">
       {nav.map((item) => {
         const active = pathname === item.href
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`group relative flex h-14 w-14 items-center justify-center rounded-2xl text-[var(--text-muted)] transition-colors duration-200 ${
+            className={`group relative flex h-12 w-12 items-center justify-center rounded-full text-[var(--text-muted)] transition-colors duration-200 lg:h-14 lg:w-14 ${
               active
                 ? 'bg-[var(--accent-soft)] text-[var(--accent)] shadow-lg shadow-[var(--accent-soft)]'
-                : 'hover:bg-white/40 hover:text-[var(--text-primary)]'
+                : 'hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]'
             }`}
           >
             <item.icon className="h-6 w-6" />
-            <span className="pointer-events-none absolute left-full top-1/2 hidden -translate-y-1/2 rounded-full border border-[var(--panel-border)] bg-[var(--panel-bg)] px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)] shadow-lg group-hover:flex">
+            <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-full border border-[var(--panel-border)] bg-[var(--panel-bg)] px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-[var(--text-muted)] shadow-lg group-hover:flex lg:bottom-auto lg:left-full lg:top-1/2 lg:mb-0 lg:ml-2 lg:-translate-x-0 lg:-translate-y-1/2">
               {item.label}
             </span>
           </Link>
@@ -97,7 +97,7 @@ export default function Sidebar({ onSearchClick }: SidebarProps) {
       <button
         type="button"
         onClick={onSearchClick}
-        className="group relative flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] text-[var(--text-muted)] transition hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
+        className="group relative flex h-12 w-12 items-center justify-center rounded-full border border-[var(--card-border)] bg-[var(--panel-bg)] text-[var(--text-muted)] transition hover:border-[var(--accent)] hover:text-[var(--text-primary)]"
         title="Search"
       >
         <span className="sr-only">Open search</span>
@@ -106,7 +106,7 @@ export default function Sidebar({ onSearchClick }: SidebarProps) {
           <path d="M16 16l5 5" />
         </svg>
       </button>
-      <div className="mt-2 flex w-full items-center justify-center rounded-2xl">
+      <div className="flex w-full items-center justify-center rounded-2xl lg:mt-2">
         <ThemeToggle compact />
       </div>
     </aside>
