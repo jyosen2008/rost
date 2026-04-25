@@ -120,9 +120,13 @@ insert into categories (name) values
   ('Creative Process'),
   ('Quick Notes'),
   ('Quote Reacts'),
+  ('Duet Essays'),
+  ('Anonymous Stories'),
   ('Drops'),
   ('Series'),
-  ('Chains')
+  ('Chains'),
+  ('Campus Mode'),
+  ('City Mode')
 on conflict do nothing;
 
 insert into tags (name) values
@@ -133,9 +137,15 @@ insert into tags (name) values
   ('archive'),
   ('quick-note'),
   ('quote-react'),
+  ('response-essay'),
+  ('anonymous-verified'),
   ('drop'),
   ('felt-this'),
-  ('need-part-2')
+  ('need-part-2'),
+  ('main-character'),
+  ('campus'),
+  ('heartbreak'),
+  ('workplace')
 on conflict do nothing;
 
 create index if not exists posts_tags_gin_idx on posts using gin (tags);

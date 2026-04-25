@@ -16,7 +16,7 @@ export default function CulturePulse({ posts, onSelectTag, onSelectCategory }: C
 
   return (
     <section className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
-      <div className="glass-panel p-5">
+      <div className="vibe-panel p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">ROST pulse</p>
@@ -45,7 +45,7 @@ export default function CulturePulse({ posts, onSelectTag, onSelectCategory }: C
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-        <article className="glass-panel p-5">
+        <article className="vibe-panel p-5">
           <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Chains</p>
           <h3 className="mt-2 text-lg font-semibold text-[var(--text-primary)]">
             {featuredChain ? featuredChain.name.replace(/-/g, ' ') : 'Start a chain'}
@@ -57,7 +57,7 @@ export default function CulturePulse({ posts, onSelectTag, onSelectCategory }: C
           </p>
         </article>
 
-        <article className="glass-panel p-5">
+        <article className="vibe-panel p-5">
           <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Writer rooms</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {pulse.rooms.slice(0, 4).map((room) => (

@@ -6,6 +6,8 @@ import AppShell from '@/components/app/app-shell'
 import Modal from '@/components/app/modal'
 import PostCreator from '@/components/post-creator'
 import LiveStats from '@/components/live-stats'
+import ReaderIdentityCard from '@/components/app/reader-identity-card'
+import StreakCard from '@/components/app/streak-card'
 import { useProfileStats } from '@/hooks/use-profile-stats'
 import { useSession } from '@/hooks/use-session'
 import { supabaseClient } from '@/lib/supabase-client'
@@ -154,7 +156,7 @@ export default function DashboardClient({
   return (
     <AppShell>
       <div className="space-y-6">
-        <header className="glass-panel p-6">
+        <header className="vibe-panel p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Dashboard</p>
@@ -201,7 +203,12 @@ export default function DashboardClient({
           </div>
         </header>
 
-        <section className="glass-panel p-6 space-y-4">
+        <div className="grid gap-4 lg:grid-cols-[1fr,280px]">
+          <ReaderIdentityCard posts={myPosts} />
+          <StreakCard />
+        </div>
+
+        <section className="vibe-panel p-6 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-subtle)]">Profile details</p>
             <button
@@ -251,7 +258,7 @@ export default function DashboardClient({
           {actionMessage ? <p className="text-xs text-[var(--text-muted)]">{actionMessage}</p> : null}
         </section>
 
-        <section className="glass-panel p-6 space-y-4">
+        <section className="vibe-panel p-6 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.35em] text-[var(--text-subtle)]">Your posts</p>
             {myPosts.length > 0 && <span className="text-xs text-[var(--text-muted)]">Auto-updates live</span>}

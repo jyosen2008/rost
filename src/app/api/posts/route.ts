@@ -13,7 +13,7 @@ const uniqueSlug = (title: string) => {
 }
 
 export async function POST(request: NextRequest) {
-  const { title, content, excerpt, category, tags, coverUrl, authorId, authorName } = await request.json()
+  const { title, content, excerpt, category, tags, coverUrl, dropAt, authorId, authorName } = await request.json()
 
   if (!title || !content) {
     return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
@@ -26,6 +26,10 @@ export async function POST(request: NextRequest) {
     : []
 
   const categoryKey = category?.trim() ? category : null
+  const scheduledDate = dropAt ? new Date(dropAt) : null
+  const publishedAt = scheduledDate && !Number.isNaN(scheduledDate.getTime())
+    ? scheduledDate.toISOString()
+    : new Date().toISOString()
   const { data, error } = await supabaseServer.from('posts').insert({
     title,
     slug: uniqueSlug(title),
@@ -34,7 +38,7 @@ export async function POST(request: NextRequest) {
     category: categoryKey,
     tags: tagArray,
     cover_url: coverUrl,
-    published_at: new Date().toISOString(),
+    published_at: publishedAt,
     author_id: authorId ?? null,
     author_name: authorName ?? null
   }).select('id, title, slug, excerpt, cover_url, category, tags, content, published_at, created_at, author_name, author_id')

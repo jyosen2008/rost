@@ -4,7 +4,7 @@ import { Post } from '@/lib/db'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { buildShareText, getPostFeatureMeta, moodReactions } from '@/lib/rost-features'
+import { buildShareText, getPostFeatureMeta, getStoryHeatScore, moodReactions } from '@/lib/rost-features'
 import { useEffect, useMemo, useState } from 'react'
 
 type PostCardProps = {
@@ -25,6 +25,10 @@ export default function PostCard({
   onToggleLike
 }: PostCardProps) {
   const meta = useMemo(() => getPostFeatureMeta(post), [post])
+  const heatScore = useMemo(
+    () => getStoryHeatScore(post, likeCount, isBookmarked ? 1 : 0),
+    [post, likeCount, isBookmarked]
+  )
   const [reaction, setReaction] = useState<string | null>(null)
   const [shareStatus, setShareStatus] = useState('')
 
@@ -54,7 +58,7 @@ export default function PostCard({
   return (
     <motion.article
       whileHover={{ y: -4 }}
-      className="group transform rounded-[28px] border border-[var(--card-border)] bg-[var(--panel-bg)] p-6 shadow-2xl shadow-black/10 transition"
+      className="group vibe-panel transform p-6 transition"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs uppercase text-[var(--text-subtle)]">
         <span>{post.category ?? 'Uncategorized'}</span>
@@ -63,6 +67,8 @@ export default function PostCard({
       <div className="mt-3 flex flex-wrap gap-2">
         {meta.isQuickNote ? <FeatureBadge label="Quick note" /> : null}
         {meta.isQuoteReact ? <FeatureBadge label="Quote react" /> : null}
+        {meta.isResponseEssay ? <FeatureBadge label="Duet essay" /> : null}
+        {meta.isAnonymous ? <FeatureBadge label="Anon verified" /> : null}
         {meta.seriesName ? <FeatureBadge label={`Series: ${meta.seriesName}`} /> : null}
         {meta.episodeNumber ? <FeatureBadge label={`Ep ${meta.episodeNumber}`} /> : null}
         {meta.isDrop ? <FeatureBadge label={meta.dropLabel ? `Drop: ${meta.dropLabel}` : 'Drop'} /> : null}
@@ -80,6 +86,16 @@ export default function PostCard({
           className="mt-4 block rounded-2xl border border-[var(--card-border)] bg-[var(--accent-soft)] p-4 text-sm text-[var(--text-muted)]"
         >
           Quote-reacting to: <span className="text-[var(--accent)]">{meta.quoteUrl}</span>
+        </a>
+      ) : null}
+      {meta.isResponseEssay && meta.responseUrl ? (
+        <a
+          href={meta.responseUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 block rounded-2xl border border-[var(--card-border)] bg-[var(--surface-raised)] p-4 text-sm text-[var(--text-muted)]"
+        >
+          Duet essay responding to: <span className="text-[var(--accent)]">{meta.responseUrl}</span>
         </a>
       ) : null}
       {post.cover_url ? (
@@ -128,9 +144,9 @@ export default function PostCard({
               disabled={!onToggleLike}
               className={`flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.3em] transition ${
                 liked
-                  ? 'text-ember'
-                  : 'text-peat/60 hover:text-peat'
-              } ${!onToggleLike ? 'cursor-not-allowed text-peat/30' : ''}`}
+                  ? 'text-[var(--accent-variant)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              } ${!onToggleLike ? 'cursor-not-allowed opacity-40' : ''}`}
             >
               <span aria-hidden="true" className="text-lg">
                 {liked ? '♥' : '♡'}
@@ -139,10 +155,13 @@ export default function PostCard({
             </button>
             <Link
               href={`/posts/${post.slug ?? post.id}#discussion`}
-              className="text-peat/60 underline underline-offset-4"
+              className="text-[var(--text-muted)] underline underline-offset-4"
             >
               Comment
             </Link>
+            <span className="rounded-full border border-[var(--card-border)] px-3 py-1 text-xs font-semibold text-[var(--text-muted)]">
+              Heat {heatScore}
+            </span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <button
@@ -158,8 +177,8 @@ export default function PostCard({
                 onClick={onBookmarkToggle}
                 className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] transition ${
                   isBookmarked
-                    ? 'border-ember/70 bg-ember/10 text-ember'
-                    : 'border-white/40 text-peat/70 hover:border-peat/60'
+                    ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
+                    : 'border-[var(--card-border)] text-[var(--text-muted)] hover:border-[var(--accent)]'
                 }`}
               >
                 <span aria-hidden="true" className="text-xs">

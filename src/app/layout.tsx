@@ -26,9 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={clsx(playfair.variable, inter.variable)}>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)]">
         <ThemeProvider>
-          <div className="relative min-h-screen overflow-hidden px-4 py-8 sm:px-8 lg:px-12">
-            <div className="relative mx-auto max-w-6xl">
-              <div className="relative rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-surface)] p-6 shadow-lg shadow-[rgba(8,16,32,0.3)]">
+          <div className="relative min-h-screen overflow-hidden px-3 py-5 sm:px-6 lg:px-10">
+            <div className="relative mx-auto max-w-7xl">
+              <div className="relative rounded-[28px] border border-[var(--panel-border)] bg-[var(--panel-surface)] p-4 shadow-2xl shadow-[rgba(8,16,32,0.26)] backdrop-blur-2xl sm:p-6">
                 {children}
               </div>
             </div>

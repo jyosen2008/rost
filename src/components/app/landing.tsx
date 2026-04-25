@@ -21,17 +21,25 @@ export default function Landing() {
   }, [loading, user, router])
 
   return (
-    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden rounded-3xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-6 shadow-2xl shadow-black/30">
+    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden rounded-[28px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-6 shadow-2xl shadow-black/30">
       <WateryBackground />
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.15fr,0.85fr]">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr,0.9fr]">
         <div className="space-y-5">
-          <p className="text-xs uppercase tracking-[0.5em] text-[var(--text-subtle)]">Röst</p>
-          <h1 className="text-4xl font-semibold leading-tight text-[var(--text-primary)] sm:text-6xl">
-            Reflections, opinions, stories, thoughts.
+          <p className="text-xs uppercase tracking-[0.5em] text-[var(--text-subtle)]">ROST</p>
+          <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-[var(--text-primary)] sm:text-6xl">
+            The writing app with group-chat velocity.
           </h1>
           <p className="max-w-xl text-lg text-[var(--text-muted)]">
-            A pastel-blue sanctuary for writing, sharing, and following the voices you care about.
+            Anonymous verified stories, duet essays, culture rooms, live drops, and a co-editor that helps every post land sharper.
           </p>
+          <div className="grid max-w-2xl gap-3 sm:grid-cols-3">
+            {['Rooms', 'Digest', 'Duets'].map((item) => (
+              <div key={item} className="vibe-panel p-4">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{item}</p>
+                <p className="mt-1 text-xs text-[var(--text-muted)]">Built into the live feed</p>
+              </div>
+            ))}
+          </div>
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"

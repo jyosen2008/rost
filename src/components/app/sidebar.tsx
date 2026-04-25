@@ -10,7 +10,8 @@ type SidebarProps = {
 
 const nav = [
   { href: '/home', label: 'Home', icon: IconHome },
-  { href: '/dashboard', label: 'Dashboard', icon: IconDashboard }
+  { href: '/dashboard', label: 'Studio', icon: IconDashboard },
+  { href: '/profile', label: 'Profile', icon: IconProfile }
 ]
 
 type IconProps = {
@@ -48,6 +49,23 @@ function IconDashboard({ className }: IconProps) {
       <rect x="14" y="3" width="7" height="5" rx="1" />
       <rect x="3" y="14" width="7" height="7" rx="1" />
       <rect x="14" y="12" width="7" height="9" rx="1" />
+    </svg>
+  )
+}
+
+function IconProfile({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M5 21a7 7 0 0 1 14 0" />
     </svg>
   )
 }

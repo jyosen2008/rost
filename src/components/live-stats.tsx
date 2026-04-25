@@ -46,8 +46,8 @@ export default function LiveStats({
           supabaseClient.from('posts').select('id', { head: true, count: 'exact' }),
           supabaseClient.from('comments').select('id', { head: true, count: 'exact' }),
           supabaseClient.from('bookmarks').select('id', { head: true, count: 'exact' }),
-          supabaseClient.from('categories').select('id', { head: true, count: 'exact' }),
-          supabaseClient.from('tags').select('id', { head: true, count: 'exact' }),
+          supabaseClient.from('categories').select('name', { head: true, count: 'exact' }),
+          supabaseClient.from('tags').select('name', { head: true, count: 'exact' }),
           supabaseClient.from('profiles').select('user_id', { head: true, count: 'exact' })
         ])
 

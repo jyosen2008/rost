@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import AppShell from '@/components/app/app-shell'
 import CulturePulse from '@/components/app/culture-pulse'
+import RoomNavigator from '@/components/app/room-navigator'
+import RostDigest from '@/components/app/rost-digest'
+import StreakCard from '@/components/app/streak-card'
 import PostCard from '@/components/post-card'
 import { useBookmarks } from '@/hooks/use-bookmarks'
 import { usePostInteractions } from '@/hooks/use-post-interactions'
@@ -213,18 +216,29 @@ export default function HomeFeedClient({
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-subtle)]">Home</p>
-              <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Your feed</h1>
+              <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">The live ROST room</h1>
               <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Fresh posts, quick notes, quote-reacts, drops, chains, and series from people you follow and the
-                topics you love.
+                Fresh posts, anonymous drops, duet essays, chain prompts, and culture signals from the people you follow.
               </p>
             </div>
           </div>
         </header>
 
+        <div className="grid gap-4 xl:grid-cols-[1fr,260px]">
+          <RostDigest posts={displayPosts} />
+          <StreakCard />
+        </div>
+
         <CulturePulse
           posts={displayPosts}
           onSelectTag={addSingleHashtagFilter}
+          onSelectCategory={setSelectedCategory}
+        />
+
+        <RoomNavigator
+          categories={categories}
+          posts={displayPosts}
+          selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
         />
 

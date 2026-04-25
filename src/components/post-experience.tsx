@@ -17,6 +17,10 @@ export default function PostExperience({ post }: PostExperienceProps) {
     [post.content]
   )
   const skimParagraphs = paragraphs.slice(0, 2)
+  const dropTime = post.published_at ? new Date(post.published_at).getTime() : null
+  const dropLabel = dropTime && dropTime > Date.now()
+    ? new Date(dropTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : null
 
   const speak = () => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
@@ -62,6 +66,31 @@ export default function PostExperience({ post }: PostExperienceProps) {
         </button>
       </div>
 
+      {meta.isDrop ? (
+        <div className="vibe-panel p-4">
+          <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">Live drop event</p>
+          <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">
+            {dropLabel ? `Unlocking ${dropLabel}` : meta.dropLabel ? `Drop: ${meta.dropLabel}` : 'This post launched as a ROST drop.'}
+          </p>
+        </div>
+      ) : null}
+
+      {(meta.quoteUrl || meta.responseUrl) ? (
+        <div className="vibe-panel p-4">
+          <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[var(--text-subtle)]">
+            {meta.responseUrl ? 'Duet source' : 'Quote source'}
+          </p>
+          <a
+            href={meta.responseUrl ?? meta.quoteUrl ?? '#'}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 block break-all text-sm font-semibold text-[var(--accent)]"
+          >
+            {meta.responseUrl ?? meta.quoteUrl}
+          </a>
+        </div>
+      ) : null}
+
       <article className="rounded-[28px] border border-[var(--card-border)] bg-[var(--panel-bg)] p-6 text-base leading-relaxed text-[var(--text-muted)]">
         {mode === 'listen' ? (
           <div className="space-y-3">
@@ -72,7 +101,7 @@ export default function PostExperience({ post }: PostExperienceProps) {
         ) : (
           (mode === 'skim' ? skimParagraphs : paragraphs).map((paragraph) => (
             <p key={paragraph} className="mb-4 text-lg last:mb-0">
-              {paragraph.replace(/^quote:\s*/i, '')}
+              {paragraph.replace(/^quote:\s*/i, '').replace(/^response:\s*/i, '')}
             </p>
           ))
         )}

@@ -5,6 +5,7 @@ import { getComments, getPostBySlug } from '@/lib/db'
 import CommentForm from '@/components/comment-form'
 import PostExperience from '@/components/post-experience'
 import { getPostFeatureMeta } from '@/lib/rost-features'
+import CommentHighlights from '@/components/comment-highlights'
 
 const formatDate = (value: string) => new Date(value).toLocaleDateString('en-IN', {
   month: 'short',
@@ -12,9 +13,7 @@ const formatDate = (value: string) => new Date(value).toLocaleDateString('en-IN'
   year: 'numeric'
 })
 
-async function CommentsList({ postId }: { postId: string }) {
-  const comments = await getComments(postId)
-
+function CommentsList({ comments }: { comments: Awaited<ReturnType<typeof getComments>> }) {
   if (comments.length === 0) {
     return <p className="text-sm text-peat/60">No comments yet. Start the conversation.</p>
   }
@@ -22,10 +21,10 @@ async function CommentsList({ postId }: { postId: string }) {
   return (
     <div className="space-y-3">
       {comments.map((comment) => (
-        <article key={comment.id} className="rounded-2xl border border-peat/10 bg-white/80 p-4 text-sm text-peat/80">
-          <p className="text-xs uppercase tracking-[0.3em] text-peat/60">{comment.author_name}</p>
-          <p className="mt-2 text-base text-peat/90">{comment.body}</p>
-          <p className="mt-2 text-xs text-peat/50">{formatDate(comment.created_at)}</p>
+        <article key={comment.id} className="rounded-2xl border border-[var(--card-border)] bg-[var(--panel-bg)] p-4 text-sm text-[var(--text-muted)]">
+          <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-subtle)]">{comment.author_name}</p>
+          <p className="mt-2 text-base text-[var(--text-primary)]">{comment.body}</p>
+          <p className="mt-2 text-xs text-[var(--text-subtle)]">{formatDate(comment.created_at)}</p>
         </article>
       ))}
     </div>
@@ -39,7 +38,10 @@ export default async function PostPage({ params }: { params: { slug: string } })
     notFound()
   }
 
-  const meta = getPostFeatureMeta(post)
+  const [comments, meta] = await Promise.all([
+    getComments(post.id),
+    Promise.resolve(getPostFeatureMeta(post))
+  ])
 
   return (
     <main className="mx-auto max-w-4xl space-y-8 rounded-[28px] border border-[var(--panel-border)] bg-[var(--panel-surface)] p-6">
@@ -61,6 +63,16 @@ export default async function PostPage({ params }: { params: { slug: string } })
               Chain: {meta.chainName}
             </span>
           ) : null}
+          {meta.isResponseEssay ? (
+            <span className="rounded-full border border-[var(--accent)] bg-[var(--accent-soft)] px-3 py-1 text-[0.65rem] uppercase tracking-[0.25em] text-[var(--accent)]">
+              Duet essay
+            </span>
+          ) : null}
+          {meta.isAnonymous ? (
+            <span className="rounded-full border border-[var(--accent-variant)] bg-[var(--surface-raised)] px-3 py-1 text-[0.65rem] uppercase tracking-[0.25em] text-[var(--accent-variant)]">
+              Anonymous verified
+            </span>
+          ) : null}
         </div>
         <h1 className="text-4xl font-semibold text-[var(--text-primary)]">{post.title}</h1>
         <p className="text-sm text-[var(--text-muted)]">
@@ -78,7 +90,8 @@ export default async function PostPage({ params }: { params: { slug: string } })
           <h2 className="text-xl font-semibold text-[var(--text-primary)]">Discussion</h2>
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-subtle)]">Public</p>
         </div>
-        <CommentsList postId={post.id} />
+        <CommentHighlights comments={comments} />
+        <CommentsList comments={comments} />
         <CommentForm postId={post.id} />
       </section>
     </main>
